@@ -534,12 +534,174 @@
   .claimTrack,.mainClaimTrack,.activityClaimTrack{min-height:120px!important;height:auto!important}
 }
 
+
+
+    /* Review modules and clearer color grouping */
+    .reviewModule{position:relative;border-radius:28px;padding:20px;border:1px solid rgba(15,37,68,.10);box-shadow:var(--soft);overflow:hidden;background:#fff}
+    .reviewModule:before{content:"";position:absolute;inset:0;opacity:.22;pointer-events:none;background:linear-gradient(135deg,var(--teal),transparent 55%)}
+    .reviewModule>*{position:relative;z-index:1}.reviewModule.icd{background:linear-gradient(135deg,#ecfeff,#fff)}.reviewModule.cpt{background:linear-gradient(135deg,#f2efff,#fff)}.reviewModule.pos{background:linear-gradient(135deg,#fff7ed,#fff)}.reviewModule.mdm{background:linear-gradient(135deg,#ecfdf5,#fff)}.reviewModule.claim{background:linear-gradient(135deg,#fff1f2,#fff)}.reviewModule.abbrev{background:linear-gradient(135deg,#eff6ff,#fff)}
+    .reviewModule h3{display:flex;align-items:center;gap:10px}.reviewTag{display:inline-flex;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:1000;color:#fff;background:var(--navy)}
+    .checkArea{margin-top:14px}.checkQuestion{font-weight:950;color:var(--navy);margin:10px 0}.checkChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}@media(max-width:760px){.checkChoices{grid-template-columns:1fr}}
+    .checkChoice{border:2px solid rgba(15,37,68,.10);background:rgba(255,255,255,.88);border-radius:18px;padding:13px 14px;font-weight:850;text-align:left;cursor:pointer;min-height:64px;transition:.18s;display:flex;align-items:center}.checkChoice:hover{transform:translateY(-2px);box-shadow:var(--soft)}.checkChoice.correct{border-color:#22c55e;background:#ecfdf5}.checkChoice.wrong{border-color:#fb7185;background:#fff1f2;animation:shake .25s ease}.checkFeedback{margin-top:10px;border-radius:16px;padding:12px;background:rgba(255,255,255,.72);font-weight:800}.referencePanel{border-radius:24px;padding:18px;background:linear-gradient(135deg,rgba(15,37,68,.94),rgba(109,93,252,.90));color:white;box-shadow:var(--shadow)}.referencePanel b{color:#ffe08a}.referencePanel .reviewChip{color:var(--navy)}
+    .caseBtn:nth-child(1){background:linear-gradient(135deg,#ecfeff,#fff)!important}.caseBtn:nth-child(2){background:linear-gradient(135deg,#f2efff,#fff)!important}.caseBtn:nth-child(3){background:linear-gradient(135deg,#fff7ed,#fff)!important}.caseBtn:nth-child(4){background:linear-gradient(135deg,#ecfdf5,#fff)!important}.caseBtn:nth-child(5){background:linear-gradient(135deg,#fff1f2,#fff)!important}.caseBtn.active{outline:4px solid rgba(15,37,68,.18);transform:translateY(-2px)}
+    #planNav .activityBtn:nth-child(1){background:linear-gradient(135deg,#ecfeff,#fff)}#planNav .activityBtn:nth-child(2){background:linear-gradient(135deg,#f2efff,#fff)}#planNav .activityBtn:nth-child(3){background:linear-gradient(135deg,#fff7ed,#fff)}#planNav .activityBtn:nth-child(4){background:linear-gradient(135deg,#ecfdf5,#fff)}#planNav .activityBtn.active{background:linear-gradient(135deg,var(--navy),var(--violet));color:white}
+    #activityNav .activityBtn:nth-child(1){background:linear-gradient(135deg,#ecfeff,#fff)}#activityNav .activityBtn:nth-child(2){background:linear-gradient(135deg,#f2efff,#fff)}#activityNav .activityBtn:nth-child(3){background:linear-gradient(135deg,#fff7ed,#fff)}#activityNav .activityBtn.active{background:linear-gradient(135deg,var(--teal),var(--violet));color:white}
+    .selectHelper{font-size:12px;color:var(--muted);font-weight:750;margin-top:4px}.equalizeOptionText{font-variant-numeric:tabular-nums}
+
+  
+
+    /* Darker, glassier, shinier claim-file buttons */
+    .caseBtn, #activityNav .activityBtn{
+      position:relative;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.28)!important;
+      color:#eef6ff!important;
+      box-shadow:
+        0 16px 34px rgba(15,37,68,.24),
+        inset 0 1px 0 rgba(255,255,255,.34),
+        inset 0 -10px 22px rgba(255,255,255,.06)!important;
+      backdrop-filter:blur(14px) saturate(145%);
+      -webkit-backdrop-filter:blur(14px) saturate(145%);
+      text-shadow:0 1px 0 rgba(0,0,0,.16);
+      transition:transform .2s ease, box-shadow .2s ease, filter .2s ease;
+    }
+    .caseBtn::before, #activityNav .activityBtn::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:linear-gradient(180deg, rgba(255,255,255,.26) 0%, rgba(255,255,255,.08) 18%, rgba(255,255,255,0) 55%);
+      pointer-events:none;
+    }
+    .caseBtn::after, #activityNav .activityBtn::after{
+      content:"";
+      position:absolute;
+      top:-24%; left:-12%;
+      width:68%; height:58%;
+      background:linear-gradient(135deg, rgba(255,255,255,.55), rgba(255,255,255,.06));
+      border-radius:999px;
+      filter:blur(3px);
+      transform:rotate(-9deg);
+      pointer-events:none;
+      opacity:.9;
+    }
+    .caseBtn:hover, #activityNav .activityBtn:hover{
+      transform:translateY(-2px);
+      filter:brightness(1.06);
+      box-shadow:
+        0 20px 42px rgba(15,37,68,.28),
+        inset 0 1px 0 rgba(255,255,255,.38),
+        inset 0 -10px 22px rgba(255,255,255,.08)!important;
+    }
+    .caseBtn b, .caseBtn .mini, #activityNav .activityBtn b, #activityNav .activityBtn .mini{
+      position:relative;z-index:1;color:inherit!important;
+    }
+    .caseBtn .mini, #activityNav .activityBtn .mini{opacity:.92}
+    .caseBtn:nth-child(1), #activityNav .activityBtn:nth-child(1){background:linear-gradient(135deg, rgba(11,51,80,.95), rgba(0,141,158,.88))!important;}
+    .caseBtn:nth-child(2), #activityNav .activityBtn:nth-child(2){background:linear-gradient(135deg, rgba(37,33,82,.96), rgba(104,73,220,.88))!important;}
+    .caseBtn:nth-child(3), #activityNav .activityBtn:nth-child(3){background:linear-gradient(135deg, rgba(94,44,16,.96), rgba(214,112,43,.88))!important;}
+    .caseBtn:nth-child(4), #activityNav .activityBtn:nth-child(4){background:linear-gradient(135deg, rgba(10,71,56,.96), rgba(28,168,123,.86))!important;}
+    .caseBtn:nth-child(5){background:linear-gradient(135deg, rgba(105,24,45,.96), rgba(221,78,123,.86))!important;}
+    .caseBtn.active, #activityNav .activityBtn.active{
+      outline:3px solid rgba(255,255,255,.45)!important;
+      box-shadow:
+        0 22px 48px rgba(15,37,68,.30),
+        0 0 0 4px rgba(109,93,252,.16),
+        inset 0 1px 0 rgba(255,255,255,.45)!important;
+    }
+    .caseBtn.done, #activityNav .activityBtn.done{
+      border-color:rgba(167,243,208,.68)!important;
+    }
+
+
+
+    /* Legibility fix: center the Case A–D text and make it bright white */
+    .caseBtn, #activityNav .activityBtn{
+      text-align:center!important;
+      display:flex!important;
+      flex-direction:column!important;
+      align-items:center!important;
+      justify-content:center!important;
+      gap:6px!important;
+      min-height:92px!important;
+      padding:16px 14px!important;
+      color:#ffffff!important;
+      font-family:"Segoe UI", Inter, Arial, sans-serif!important;
+      letter-spacing:.2px!important;
+    }
+    .caseBtn b, #activityNav .activityBtn b{
+      display:block!important;
+      width:100%!important;
+      text-align:center!important;
+      color:#ffffff!important;
+      font-size:18px!important;
+      line-height:1.15!important;
+      font-weight:1000!important;
+      text-shadow:0 2px 8px rgba(0,0,0,.45)!important;
+      margin:0!important;
+    }
+    .caseBtn .mini, #activityNav .activityBtn .mini{
+      display:block!important;
+      width:100%!important;
+      text-align:center!important;
+      color:rgba(255,255,255,.92)!important;
+      font-size:12px!important;
+      line-height:1.2!important;
+      font-weight:850!important;
+      text-shadow:0 1px 6px rgba(0,0,0,.35)!important;
+      margin:0!important;
+    }
+    .caseBtn span:not(.badge), #activityNav .activityBtn span:not(.badge){
+      color:rgba(255,255,255,.92)!important;
+    }
+    .caseBtn .badge{
+      align-self:center!important;
+      margin-top:4px!important;
+      background:rgba(255,255,255,.20)!important;
+      color:#fff!important;
+      border:1px solid rgba(255,255,255,.32)!important;
+      text-shadow:none!important;
+      backdrop-filter:blur(8px);
+    }
+    .caseSelect, .activityNav{
+      align-items:stretch!important;
+    }
+
+
+
+    /* Force Claim File Case A–E labels to white and centered */
+    #caseSelect .caseBtn,
+    #caseSelect .caseBtn *{
+      color:#ffffff!important;
+      text-align:center!important;
+    }
+    #caseSelect .caseBtn h3{
+      color:#ffffff!important;
+      font-size:24px!important;
+      font-weight:1000!important;
+      line-height:1.05!important;
+      margin:6px 0 2px!important;
+      text-shadow:0 3px 10px rgba(0,0,0,.55)!important;
+      letter-spacing:.35px!important;
+    }
+    #caseSelect .caseBtn p,
+    #caseSelect .caseBtn .mini{
+      color:rgba(255,255,255,.94)!important;
+      font-weight:900!important;
+      text-shadow:0 2px 7px rgba(0,0,0,.45)!important;
+    }
+    #caseSelect .caseBtn .badge{
+      color:#ffffff!important;
+      background:rgba(255,255,255,.18)!important;
+      border:1px solid rgba(255,255,255,.36)!important;
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.22)!important;
+    }
+
 </style>
 </head>
 <body>
   <header>
     <div class="wrap top">
-      <div class="brand"><div class="logo">CC</div><div><h1>Clean Claim Command Center</h1><div class="subtitle">Complex SOAP Notes → Codes → POS → MDM → Modifier → Clearinghouse/Payer Decision</div><div class="brandCredit">Advanced student-facing claim reasoning lab</div></div></div>
+      <div class="brand"><div class="logo">CC</div><div><h1>Clean Claim Command Center</h1><div class="subtitle">Complex SOAP Notes → Codes → POS → MDM → Modifier → Clearinghouse/Payer Decision</div></div></div>
       <div class="controls noPrint">
         <button class="btn" id="soundBtn" aria-label="Toggle sound">Sound: On</button>
         <button class="btn coral" id="resetBtn">Reset</button>
@@ -559,10 +721,10 @@
     <section class="page active" id="review">
       <div class="grid">
         <div class="card span8">
-          <h2>Today’s Mission</h2>
-          <p class="callout"><b>Opening message:</b> You are not just filling out forms. You are reading clinical evidence, choosing the strongest codes, checking the setting, defending medical necessity, and preventing claims from bouncing back.</p>
+          <h2>Quick Review Before the Claim Lab</h2>
+          <p class="callout"><b>Mission:</b> Before you hunt through cases, check the language. ICD-10, CPT, POS, MDM, rejection, denial, HPI, A/P, and R/O are the clues that control the claim.</p>
           <div class="flow" aria-label="Claim flow diagram">
-            <span>SOAP Note</span><b class="arrow">→</b><span>ICD-10</span><b class="arrow">→</b><span>CPT</span><b class="arrow">→</b><span>Modifier</span><b class="arrow">→</b><span>POS</span><b class="arrow">→</b><span>Clearinghouse</span><b class="arrow">→</b><span>Payer</span>
+            <span>Provider Note</span><b class="arrow">→</b><span>ICD-10</span><b class="arrow">→</b><span>CPT</span><b class="arrow">→</b><span>POS</span><b class="arrow">→</b><span>MDM</span><b class="arrow">→</b><span>Modifier</span><b class="arrow">→</b><span>Clearinghouse / Payer</span>
           </div>
         </div>
         <div class="card span4">
@@ -571,16 +733,48 @@
           <p class="mini"><span id="progressText">0 of 5 cases mastered</span></p>
           <div class="mastery" id="masteryChips"></div>
         </div>
-        <div class="card span6">
-          <h3>Quick Sorting: Rejected vs. Denied</h3>
-          <p><b>Rejected</b> means the claim could not be processed because required information was missing, invalid, or structurally wrong.</p>
-          <p><b>Denied</b> means the claim was processed, but the payer refused payment because of coverage, policy, medical necessity, or code logic.</p>
-          <button class="btn primary" onclick="goPage('lab')">Start Five-Case Lab</button>
+
+        <div class="span12 referencePanel">
+          <h3 style="color:white;margin-bottom:8px">Reference Desk You Can Come Back To</h3>
+          <p>Use this as a fast map. <b>ICD-10 explains why.</b> <b>CPT explains what.</b> <b>POS explains where.</b> <b>MDM explains complexity.</b> <b>Modifiers explain special circumstances.</b></p>
+          <span class="reviewChip">ICD-10 = diagnosis / reason</span><span class="reviewChip">CPT = service / procedure</span><span class="reviewChip">POS = place of service</span><span class="reviewChip">MDM = complexity of decision-making</span><span class="reviewChip">A/P = assessment and plan</span><span class="reviewChip">HPI = history of present illness</span><span class="reviewChip">R/O = rule out, not confirmed</span>
         </div>
-        <div class="card span6">
-          <h3>Fast Reference</h3>
-          <span class="reviewChip">ICD-10 = why</span><span class="reviewChip">CPT = what</span><span class="reviewChip">POS = where</span><span class="reviewChip">MDM = complexity</span><span class="reviewChip">Modifier = special circumstance</span><span class="reviewChip">Medical necessity = claim argument</span>
-          <p class="warning"><b>Warning:</b> The diagnosis for the visit is not always the patient’s entire medical history. Comorbidities matter only when they affect care, complexity, or medical necessity.</p>
+
+        <div class="reviewModule icd span6">
+          <h3><span class="reviewTag">ICD-10</span> Why was the service medically necessary?</h3>
+          <p>ICD-10-CM points to the diagnosis, condition, symptom, or documented reason for the visit. Do not code every old problem just because it appears in the chart.</p>
+          <div class="checkArea" id="reviewQ_icd"></div>
+        </div>
+        <div class="reviewModule cpt span6">
+          <h3><span class="reviewTag">CPT</span> What service was performed?</h3>
+          <p>CPT describes the visit, test, procedure, or service. In E/M coding, students must also notice new-vs-return-visit clues without expecting the note to announce it.</p>
+          <div class="checkArea" id="reviewQ_cpt"></div>
+        </div>
+        <div class="reviewModule pos span6">
+          <h3><span class="reviewTag">POS</span> Where did it happen?</h3>
+          <p>POS must match the real setting. Office, hospital, emergency room, urgent care, and telehealth are not interchangeable.</p>
+          <div class="checkArea" id="reviewQ_pos"></div>
+        </div>
+        <div class="reviewModule mdm span6">
+          <h3><span class="reviewTag">MDM</span> How complex was the provider decision?</h3>
+          <p>MDM depends on problem complexity, data reviewed, and risk of management. A scary word alone does not automatically mean high MDM.</p>
+          <div class="checkArea" id="reviewQ_mdm"></div>
+        </div>
+        <div class="reviewModule claim span6">
+          <h3><span class="reviewTag">RETURNED CLAIM</span> Rejected or denied?</h3>
+          <p>Rejected means the claim could not be processed. Denied means it was processed but payment was refused for a payer reason.</p>
+          <div class="checkArea" id="reviewQ_return"></div><div class="checkArea" id="reviewQ_denial"></div>
+        </div>
+        <div class="reviewModule abbrev span6">
+          <h3><span class="reviewTag">CHART CLUES</span> HPI, A/P, and R/O</h3>
+          <p>Real notes use shorthand. Students must understand the abbreviations before they can hunt for codes correctly.</p>
+          <div class="checkArea" id="reviewQ_hpi"></div><div class="checkArea" id="reviewQ_ap"></div><div class="checkArea" id="reviewQ_abbrev"></div>
+        </div>
+
+        <div class="card span12">
+          <h3>Ready Check</h3>
+          <p class="warning"><b>Important:</b> In the case files, the note may say “chronic obstructive pulmonary disease” while the code option says COPD. The note may say “considered” or “rule out,” but that does not make it the final diagnosis. Read the whole note before choosing.</p>
+          <button class="btn primary" onclick="goPage('lab')">Start Five-Case Claim Lab</button>
         </div>
       </div>
     </section>
@@ -762,6 +956,8 @@ let state = JSON.parse(localStorage.getItem('cleanClaimState')||'{}');
 if(!state.mastered) state.mastered = {};
 if(!state.attempts) state.attempts = {};
 if(!state.caseHints) state.caseHints = {};
+if(!state.optionOrders) state.optionOrders = {};
+if(!state.reviewAnswered) state.reviewAnswered = {};
 let current = state.current || 'A';
 let soundOn = state.soundOn !== false;
 let teacherOn = state.teacherOn || false;
@@ -789,6 +985,30 @@ function beep(type='click'){
   }catch(e){}
 }
 
+
+/* ------------------------- Interactive quick review checks ------------------------- */
+const reviewChecks = {
+  icd:{q:'A provider documents cough, fever, crackles, and final assessment: pneumonia, organism not identified. What is ICD-10 doing in the claim?', a:'It supports why the visit or ordered service was medically necessary.', choices:['It supports why the visit or ordered service was medically necessary.','It identifies the exact procedure performed by the provider.','It tells the payer which office location was used today.','It replaces the CPT code when documentation is detailed.'], why:'ICD-10 explains the diagnosis/reason. It is the “why” behind the service.'},
+  cpt:{q:'The chart shows an existing MRN and a prior visit in the same practice. Which CPT clue matters?', a:'Use the return-visit code family if the service level is supported.', choices:['Use the return-visit code family if the service level is supported.','Use a new-patient code because the problem is new today.','Use an inpatient code because the note has many details.','Use only an imaging code because symptoms were mentioned.'], why:'A new complaint is not the same as a new patient. The practice relationship matters.'},
+  pos:{q:'The note says the service happened in the provider office, not a hospital or ER. What does POS report?', a:'The setting where the face-to-face service occurred today.', choices:['The setting where the face-to-face service occurred today.','The patient home address listed in demographics only.','The insurance company that processes the claim form.','The diagnosis that explains medical necessity today.'], why:'POS is the place of service. Office is commonly POS 11.'},
+  mdm:{q:'Which phrase best describes MDM?', a:'The complexity of the provider’s diagnostic and management decision.', choices:['The complexity of the provider’s diagnostic and management decision.','The patient’s total bill after the payer applies benefits.','The code set used to describe a performed procedure.','The address of the facility printed on the claim.'], why:'MDM is not the dollar amount. It is the clinical decision-making complexity.'},
+  return:{q:'A claim has a missing NPI or invalid member ID, so it cannot be processed. What is this?', a:'Rejected — the claim failed a front-end processing requirement.', choices:['Rejected — the claim failed a front-end processing requirement.','Denied — payer reviewed coverage and refused payment.','Paid — payer accepted the code linkage completely.','Appealed — payer received a written dispute packet.'], why:'Rejected usually means fix the data/format and resubmit.'},
+  denial:{q:'A claim has valid fields, but the payer refuses payment because the diagnosis does not support the procedure. What is this?', a:'Denied — the payer processed it and refused payment based on policy logic.', choices:['Denied — the payer processed it and refused payment based on policy logic.','Rejected — the clearinghouse could not read the claim data.','Drafted — the claim was saved but not sent anywhere.','Adjusted — the provider changed the charge amount only.'], why:'A denial needs corrected support, appeal logic, or documentation that answers the payer concern.'},
+  hpi:{q:'What does HPI usually tell you in the note?', a:'The story of the present illness or current reason for the visit.', choices:['The story of the present illness or current reason for the visit.','The payer’s final payment decision after adjudication.','The place-of-service code used for the encounter.','The provider’s national identifier on the claim form.'], why:'HPI is the history of the present illness. It often contains symptom timing, severity, and context.'},
+  ap:{q:'What does A/P usually point to in the provider note?', a:'The assessment and plan: diagnosis impression plus treatment plan.', choices:['The assessment and plan: diagnosis impression plus treatment plan.','The amount paid monthly to keep insurance coverage active.','The patient responsibility after coinsurance is applied.','The clearinghouse report showing formatting errors only.'], why:'A/P is assessment and plan. This is often where the strongest diagnosis and medical-necessity language appears.'},
+  abbrev:{q:'In a provider note, “R/O pneumonia” means what for coding?', a:'Pneumonia was considered, but it is not confirmed by that phrase alone.', choices:['Pneumonia was considered, but it is not confirmed by that phrase alone.','Pneumonia is always the final diagnosis for billing today.','The patient refused all ordered treatment and imaging.','The provider repeated the office visit on the same date.'], why:'R/O means rule out. Do not code a ruled-out condition as confirmed in outpatient coding.'}
+};
+function renderReviewChecks(){
+  Object.entries(reviewChecks).forEach(([id,item])=>{
+    const el=document.getElementById('reviewQ_'+id); if(!el) return;
+    const key='review_'+id; const ordered=stableShuffleOptions(key,item.choices); const saved=state.reviewAnswered[id];
+    el.innerHTML=`<div class="checkQuestion">${item.q}</div><div class="checkChoices">${ordered.map(choice=>`<button class="checkChoice ${saved===choice?(choice===item.a?'correct':'wrong'):''}" onclick="answerReview('${id}', '${escapeJs(choice)}')">${choice}</button>`).join('')}</div><div class="checkFeedback" id="reviewFb_${id}">${saved? (saved===item.a?'Correct. '+item.why:'Not quite. '+item.why) : 'Choose one answer to check your understanding.'}</div>`;
+  });
+}
+function answerReview(id, choice){
+  const item=reviewChecks[id]; state.reviewAnswered[id]=choice; save(); beep(choice===item.a?'correct':'wrong'); renderReviewChecks();
+}
+
 /* ------------------------- Navigation ------------------------- */
 function goPage(id){
   $$('.page').forEach(p=>p.classList.remove('active')); $('#'+id).classList.add('active');
@@ -804,20 +1024,30 @@ function renderCaseButtons(){
   $('#caseSelect').innerHTML = cases.map(c=>`<button class="caseBtn ${c.id===current?'active':''} ${state.mastered[c.id]?'done':''}" onclick="selectCase('${c.id}')"><span class="badge ${c.badge}">Claim File</span><h3>Case ${c.id}</h3><p class="mini">${state.mastered[c.id]?'Mastered':'Needs submission'}</p></button>`).join('');
 }
 function selectCase(id){ current=id; beep('click'); save(); renderAll(); }
-function selectOptions(options, selected){
-  return `<option value="">Choose...</option>` + shuffle(options).map(o=>`<option ${selected===o?'selected':''} value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+function stableShuffleOptions(key, options){
+  if(!state.optionOrders) state.optionOrders = {};
+  const existing = state.optionOrders[key];
+  if(existing && existing.length===options.length && existing.every(x=>options.includes(x))) return existing;
+  const ordered = shuffle(options);
+  state.optionOrders[key]=ordered;
+  localStorage.setItem('cleanClaimState', JSON.stringify(state));
+  return ordered;
 }
-function renderAll(){ renderCaseButtons(); renderCase(); if(typeof renderActivity==='function') renderActivity(); if(typeof renderPlans==='function') renderPlans(); updateProgress(); $('#soundBtn').textContent='Sound: '+(soundOn?'On':'Off'); document.body.classList.toggle('teacherOn', teacherOn); }
+function selectOptions(options, selected, key){
+  const ordered = key ? stableShuffleOptions(key, options) : shuffle(options);
+  return `<option value="">Choose...</option>` + ordered.map(o=>`<option ${selected===o?'selected':''} value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+}
+function renderAll(){ renderReviewChecks(); renderCaseButtons(); renderCase(); if(typeof renderActivity==='function') renderActivity(); if(typeof renderPlans==='function') renderPlans(); updateProgress(); $('#soundBtn').textContent='Sound: '+(soundOn?'On':'Off'); document.body.classList.toggle('teacherOn', teacherOn); }
 function renderCase(){
   const c = cases.find(x=>x.id===current); const saved = state.attempts[c.id] || {};
   $('#soapPanel').innerHTML = `<h2>Case ${c.id}</h2><p><b>Patient:</b> ${c.patient} &nbsp; <b>DOB:</b> ${c.dob}<br><b>DOS:</b> ${c.dos} &nbsp; <b>Insurance:</b> ${c.insurance} &nbsp; <b>Member:</b> ${c.member}<br><b>Location documented:</b> ${c.posText}</p>${c.soap}`;
   $('#formPanel').innerHTML = `<h2>Claim Decision Fields</h2>
     <p class="mini">Demographics are already filled. Students make the coding and claim-logic decisions.</p>
     <div class="two"><div><label>Patient</label><input type="text" value="${c.patient}" disabled></div><div><label>Date of service</label><input type="text" value="${c.dos}" disabled></div></div>
-    <label for="dx">Diagnosis / ICD-10 logic</label><select id="dx">${selectOptions(c.dxOptions, saved.dx)}</select>
-    <label for="cpt">CPT / service logic</label><select id="cpt">${selectOptions(c.cptOptions, saved.cpt)}</select>
-    <div class="two"><div><label for="pos">POS</label><select id="pos">${selectOptions(c.posOptions, saved.pos)}</select></div><div><label for="mdm">MDM Level</label><select id="mdm">${selectOptions(c.mdmOptions, saved.mdm)}</select></div></div>
-    <label for="mod">Modifier</label><select id="mod">${selectOptions(c.modOptions, saved.mod)}</select>
+    <label for="dx">Diagnosis / ICD-10 logic</label><select id="dx">${selectOptions(c.dxOptions, saved.dx, c.id+'_dx')}</select>
+    <label for="cpt">CPT / service logic</label><select id="cpt">${selectOptions(c.cptOptions, saved.cpt, c.id+'_cpt')}</select>
+    <div class="two"><div><label for="pos">POS</label><select id="pos">${selectOptions(c.posOptions, saved.pos, c.id+'_pos')}</select></div><div><label for="mdm">MDM Level</label><select id="mdm">${selectOptions(c.mdmOptions, saved.mdm, c.id+'_mdm')}</select></div></div>
+    <label for="mod">Modifier</label><select id="mod">${selectOptions(c.modOptions, saved.mod, c.id+'_mod')}</select>
     <label for="defense">One-sentence defense</label><textarea id="defense" placeholder="Example: The diagnosis supports the service because...">${saved.defense||''}</textarea>
     <div class="claimActionBar"><button class="btn primary" onclick="submitClaim()">Send Claim</button><button class="btn" onclick="saveAttemptOnly()">Save Draft</button></div>
     <div class="claimTrack mainClaimTrack" id="mainJourney" aria-live="polite"><div class="journeyStatus" id="journeyStatus">Ready: click Send Claim to watch the CMS form travel quickly, convert into a moving letter, and reach payer review.</div><div class="journeyLine"><div class="journeyFill" id="journeyFill"></div></div><div class="claimPacket" id="packet">CMS</div><div class="stamp" id="stamp"></div><div class="stations"><span id="stationClinic">Clinic</span><span id="stationClearinghouse">Clearinghouse</span><span id="stationPayer">Payer Review</span></div></div>
@@ -1019,7 +1249,7 @@ function applyHint(id){
   state.caseHints[key]=rec;
   save();
   const tid=`caseHintTimer_${c.id}_${Date.now()}`;
-  panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. You cannot collect all hints at once.</span></div>`;
+  panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. You cannot collect all hints at once.</span></div>`;
   startHintCountdown(tid, 60);
 }
 
@@ -1141,7 +1371,7 @@ function renderPlans(){
   const actionOptions=['Submit/process the clean claim and collect/apply copay per policy','Obtain referral/support and appeal or correct according to payer rule','Post allowed amount to deductible/patient responsibility','Appeal or submit authorization/documentation support according to payer policy','Bill the full provider charge without payer processing'];
   $('#planNav').innerHTML=planCases.map(x=>`<button class="activityBtn ${x.id===currentPlan?'active':''} ${state.planDone[x.id]?'done':''}" onclick="selectPlan('${x.id}')"><b>Plan File ${x.id.replace('P','')}</b><br><span class="mini">${state.planDone[x.id]?'Completed':'Needs decision'}</span></button>`).join('');
   $('#planCasePanel').innerHTML=`<h2>Plan File ${c.id.replace('P','')}</h2><p><b>Patient:</b> ${c.patient}</p><div class="soapBlock">${c.facts}</div>`;
-  $('#planWorkPanel').innerHTML=`<h2>Plan Rule Decision</h2><div class="miniForm"><div><label>Plan type</label><select id="pPlan">${selectOptions(planOptions,saved.plan||'')}</select></div><div><label>Rule that controls the claim</label><select id="pRule">${selectOptions(ruleOptions,saved.rule||'')}</select></div><div><label>Expected result</label><select id="pDecision">${selectOptions(decisionOptions,saved.decision||'')}</select></div><div><label>Best next action</label><select id="pAction">${selectOptions(actionOptions,saved.action||'')}</select></div><div style="grid-column:1/-1"><label>Explain your plan reasoning</label><textarea id="pExplain" placeholder="Explain which plan rule controls the claim and why the payer would pay, deny, reject, or shift responsibility.">${escapeHtml(saved.explanation||'')}</textarea></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="sendPlanDecision()">Send Plan Decision</button><button class="btn gold" onclick="requestPlanHint()">Request Timed Hint</button></div><div id="planHintSlot" class="planResultLarge"></div><div id="planSendResult" class="planResultLarge"></div></div>`;
+  $('#planWorkPanel').innerHTML=`<h2>Plan Rule Decision</h2><div class="miniForm"><div><label>Plan type</label><select id="pPlan">${selectOptions(planOptions,saved.plan||'', c.id+'_plan')}</select></div><div><label>Rule that controls the claim</label><select id="pRule">${selectOptions(ruleOptions,saved.rule||'', c.id+'_rule')}</select></div><div><label>Expected result</label><select id="pDecision">${selectOptions(decisionOptions,saved.decision||'', c.id+'_decision')}</select></div><div><label>Best next action</label><select id="pAction">${selectOptions(actionOptions,saved.action||'', c.id+'_action')}</select></div><div style="grid-column:1/-1"><label>Explain your plan reasoning</label><textarea id="pExplain" placeholder="Explain which plan rule controls the claim and why the payer would pay, deny, reject, or shift responsibility.">${escapeHtml(saved.explanation||'')}</textarea></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="sendPlanDecision()">Send Plan Decision</button><button class="btn gold" onclick="requestPlanHint()">Request Timed Hint</button></div><div id="planHintSlot" class="planResultLarge"></div><div id="planSendResult" class="planResultLarge"></div></div>`;
 }
 function selectPlan(id){ currentPlan=id; state.currentPlan=id; save(); renderPlans(); beep('click'); }
 function getPlanHints(c){
