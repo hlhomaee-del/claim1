@@ -515,7 +515,26 @@
     .chartHeader{display:inline-block;margin-bottom:12px;padding:6px 12px;border-radius:999px;background:linear-gradient(135deg,#e0f2fe,#f5f3ff);font-weight:1000;letter-spacing:.6px;color:#12345a;border:1px solid rgba(37,99,235,.14)}
     .noteLine{margin:10px 0;padding:9px 12px;border-left:4px solid rgba(13,148,136,.35);background:rgba(255,255,255,.72);border-radius:12px;line-height:1.55}
     .noteLine b{color:#0f766e}.signature{margin-top:16px;padding-top:12px;border-top:1px dashed rgba(15,37,68,.25);font-family:"Brush Script MT","Segoe Script",cursive;font-size:22px;color:#334155}.signature span{font-weight:900;color:#0f2544}
-  </style>
+  
+
+/* --- Fix update: visible payer response, hourglass timed hints, and reliable printing --- */
+.responseReasonPanel{margin-top:14px;border-radius:22px;padding:18px 20px;border:3px solid currentColor;background:rgba(255,255,255,.92);box-shadow:var(--soft)}
+.responseReasonPanel.rejected{color:var(--orange);background:linear-gradient(135deg,#fff7ed,#ffffff)}
+.responseReasonPanel.denied{color:var(--red);background:linear-gradient(135deg,#fef2f2,#ffffff)}
+.responseReasonPanel.paid{color:var(--green);background:linear-gradient(135deg,#ecfdf5,#ffffff)}
+.responseReasonPanel h3{margin-bottom:8px;font-size:clamp(22px,3vw,34px);font-weight:1000}.responseReasonPanel p{color:#0f2544}.responseReasonPanel .reasonLine{font-size:18px}.choiceRow{display:flex;gap:12px;flex-wrap:wrap;margin-top:14px}.choiceRow .fixOption{flex:1 1 220px}.pathGuideBox{margin-top:14px;border-radius:20px;padding:16px;background:#f8fafc;border:2px solid #dbeafe;color:#0f2544}.timedHintPanel{margin-top:14px;border-radius:22px;padding:16px 18px;background:linear-gradient(135deg,#fffbeb,#ffffff);border:3px solid #fcd34d;box-shadow:var(--soft);color:#0f2544}.hourglass{display:inline-block;font-size:24px;margin-right:8px;animation:hourglassFlip 1.2s infinite ease-in-out;vertical-align:middle}@keyframes hourglassFlip{0%,100%{transform:rotate(0deg)}50%{transform:rotate(180deg)}}.hintListMini{margin-top:10px;padding-left:18px}.hintListMini li{margin:5px 0}.printOnly{display:none}
+@media print{
+  *{color:#000!important;background:#fff!important;box-shadow:none!important;text-shadow:none!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  html,body{background:#fff!important;overflow:visible!important;height:auto!important}
+  header,.nav,.controls,.noPrint,.btn,#confetti{display:none!important}
+  main,.page,.grid,.two,.miniForm{display:block!important;visibility:visible!important;opacity:1!important;position:static!important;height:auto!important;max-height:none!important;overflow:visible!important}
+  .page{page-break-after:always;padding:0!important;margin:0!important}
+  .card,.panel,.glass,.soap,.chartNote,.result,.paidLetter,.claimWrong,.claimDone,.responseReasonPanel{display:block!important;border:1px solid #777!important;border-radius:8px!important;padding:10px!important;margin:8px 0!important;max-height:none!important;overflow:visible!important}
+  textarea,input,select{border:1px solid #555!important;background:#fff!important;color:#000!important;min-height:auto!important}
+  .claimTrack,.mainClaimTrack,.activityClaimTrack{min-height:120px!important;height:auto!important}
+}
+
+</style>
 </head>
 <body>
   <header>
@@ -742,6 +761,7 @@ const cases = [
 let state = JSON.parse(localStorage.getItem('cleanClaimState')||'{}');
 if(!state.mastered) state.mastered = {};
 if(!state.attempts) state.attempts = {};
+if(!state.caseHints) state.caseHints = {};
 let current = state.current || 'A';
 let soundOn = state.soundOn !== false;
 let teacherOn = state.teacherOn || false;
@@ -897,33 +917,137 @@ function payerCheck(c,f){
 }
 function showResult(kind,title,reason,assumed,fix,c){
   const stamp=$('#stamp'), box=$('#resultBox');
-  stamp.textContent=kind==='paid'?'PAID':kind==='rejected'?'REJECTED':'DENIED'; stamp.style.color=kind==='paid'?'var(--green)':kind==='rejected'?'var(--orange)':'var(--red)'; stamp.classList.add('show');
+  const label = kind==='paid' ? 'PAID' : kind==='rejected' ? 'REJECTED' : 'DENIED';
+  stamp.textContent = label;
+  stamp.style.color = kind==='paid' ? 'var(--green)' : kind==='rejected' ? 'var(--orange)' : 'var(--red)';
+  stamp.classList.add('show');
   if(kind==='paid') beep('correct'); else beep(kind==='rejected'?'warn':'wrong');
   box.className='result show '+kind;
-  const pathButtons = kind==='paid'
-    ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div><div class="callout"><b>Sample accepted medical-necessity answer:</b> ${c.sampleDefense || 'The diagnosis, service, setting, MDM, and modifier are supported by the documented clinical evidence.'}</div><button class="btn navy" onclick="nextCase()">Next Case</button>`
+
+  const statusClass = kind==='paid' ? 'paid' : kind==='rejected' ? 'rejected' : 'denied';
+  const studentPath = kind==='paid'
+    ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div>
+       <div class="callout"><b>Sample accepted medical-necessity answer:</b> ${c.sampleDefense || 'The diagnosis, service, setting, MDM, and modifier are supported by the documented clinical evidence.'}</div>
+       <button class="btn navy" onclick="nextCase()">Next Case</button>`
     : kind==='rejected'
-      ? `<div class="choiceRow"><button class="fixOption" onclick="resubmitPath('rejection')">Correct claim + resubmit</button><button class="fixOption" onclick="wrongPath('appeal')">Appeal denial</button><button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button></div>`
-      : `<div class="choiceRow"><button class="fixOption" onclick="wrongPath('resubmit')">Correct claim + resubmit only</button><button class="fixOption" onclick="resubmitPath('denial')">Appeal with corrected support</button><button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button></div>`;
+      ? `<div class="choiceRow">
+           <button class="fixOption" onclick="resubmitPath('rejection')">Correct claim + resubmit</button>
+           <button class="fixOption" onclick="wrongPath('appeal')">Appeal denial</button>
+           <button class="fixOption" onclick="applyHint('${c.id}')"><span class="hourglass">⌛</span>Request timed hint</button>
+         </div>`
+      : `<div class="choiceRow">
+           <button class="fixOption" onclick="wrongPath('resubmit')">Correct claim + resubmit only</button>
+           <button class="fixOption" onclick="resubmitPath('denial')">Appeal with corrected support</button>
+           <button class="fixOption" onclick="applyHint('${c.id}')"><span class="hourglass">⌛</span>Request timed hint</button>
+         </div>`;
+
+  box.innerHTML = `
+    <div class="responseReasonPanel ${statusClass}">
+      <h3>${title}</h3>
+      <p class="reasonLine"><b>Why this came back:</b> ${reason}</p>
+      <p><b>What the system/payer assumed:</b> ${assumed}</p>
+      <p><b>How to fix it:</b> ${fix}</p>
+    </div>
+    <div id="pathGuide" class="pathGuideBox">
+      ${kind==='paid'
+        ? '<b>Accepted.</b> The claim logic is defensible. Review the sample answer below.'
+        : kind==='rejected'
+          ? '<b>Choose the correct return path.</b> A rejection is a front-end processing problem. Fix the claim data and resubmit.'
+          : '<b>Choose the correct return path.</b> A denial means the payer processed the claim and refused payment. Appeal with corrected documentation/support.'}
+    </div>
+    ${studentPath}`;
+}
+
+function resubmitPath(type){
+  const guide=$('#pathGuide');
+  if(!guide) return;
+  beep('correct');
+  if(type==='rejection'){
+    guide.innerHTML = `<b>Correct pathway.</b> This is a rejection, so correct the claim fields and send it again. Look back at the returned reason before changing the dropdowns.`;
+  } else {
+    guide.innerHTML = `<b>Correct pathway.</b> This is a denial, so you need appeal logic: corrected support, stronger medical-necessity explanation, or documentation that answers the payer concern.`;
+  }
+  window.scrollTo({top:document.querySelector('#formPanel').offsetTop-20,behavior:'smooth'});
+}
+
+function wrongPath(choice){
+  const guide=$('#pathGuide');
+  if(!guide) return;
+  beep('wrong');
+  if(choice==='appeal'){
+    guide.innerHTML = `<b>Not yet.</b> This is a rejection, not a payer denial. A rejected claim usually did not adjudicate. Correct the missing/invalid/conflicting claim data, then resubmit.`;
+  } else {
+    guide.innerHTML = `<b>Wrong pathway.</b> This is a denial, meaning the payer processed the claim and refused payment. A simple resubmission may repeat the same denial. Appeal with corrected support.`;
+  }
+}
+
+function getCaseHints(c){
+  const a=c.answer;
+  return [
+    `Hint 1: Do not start with the dropdowns. First ask: what is the main reason for today’s visit, not every condition mentioned in the note?`,
+    `Hint 2: Separate symptoms, history, ruled-out concerns, and confirmed assessment. A ruled-out condition should not become the visit diagnosis.`,
+    `Hint 3: Look for the location clues and chart-status clues. Existing MRN/prior visit/follow-up language points to a return-visit code family without saying the word directly.`,
+    `Hint 4: Check whether the selected CPT, POS, MDM, and modifier tell the same story. One contradiction can make the claim return even when the diagnosis looks close.`,
+    `Hint 5: Last clue — the best diagnosis begins with the same clinical idea as: ${a.dx.split(' ')[1] || a.dx}. If the note says chronic obstructive pulmonary disease, use the acronym formed from those first letters. If it says the condition is getting worse or flaring, look for an acute exacerbation option. The clean claim also needs: CPT = ${a.cpt}; POS = ${a.pos}; MDM = ${a.mdm}; Modifier = ${a.mod}.`
+  ];
+}
+
+function applyHint(id){
+  const c=cases.find(x=>x.id===id) || cases.find(x=>x.id===current);
   const panel=$('#pathGuide') || $('#resultBox');
+  if(!panel || !c) return;
+  beep('click');
+  const key='case_'+c.id;
+  const rec=state.caseHints[key] || {shown:0,last:0};
+  const now=Date.now();
   const wait=60000-(now-(rec.last||0));
   if(rec.shown>0 && wait>0){
     const sec=Math.ceil(wait/1000);
-    const tid=`caseHintTimer_${id}_${Date.now()}`;
-    panel.innerHTML += `<div class="timedHintPanel lockedHint"><b>Hint locked.</b> Think with the evidence first. Next hint opens in <span id="${tid}" class="hintCountdown">${sec}</span>.</div>`;
+    const tid=`caseHintTimer_${c.id}_${Date.now()}`;
+    panel.innerHTML += `<div class="timedHintPanel lockedHint"><span class="hourglass">⌛</span><b>Hint locked.</b> Next hint opens in <span id="${tid}" class="hintCountdown">${formatSeconds(sec)}</span>. Use this minute to revise the claim before opening another clue.</div>`;
     startHintCountdown(tid, sec);
     return;
   }
   const hints=getCaseHints(c);
   if(rec.shown>=hints.length){
-    panel.innerHTML += `<div class="timedHintPanel"><b>No more hints.</b> You have all five thinking clues. Now defend the claim using the SOAP note.</div>`;
+    panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><b>No more hints.</b> You have all five clues. Now defend the claim in your own words.</div>`;
     return;
   }
   const hint=hints[rec.shown];
-  rec.shown += 1; rec.last=now; state.caseHints[key]=rec; save();
-  const tid=`caseHintTimer_${id}_${Date.now()}`;
-  panel.innerHTML += `<div class="timedHintPanel"><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. Use this minute to revise your reasoning before requesting another clue.</span></div>`;
+  rec.shown += 1;
+  rec.last=now;
+  state.caseHints[key]=rec;
+  save();
+  const tid=`caseHintTimer_${c.id}_${Date.now()}`;
+  panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. You cannot collect all hints at once.</span></div>`;
   startHintCountdown(tid, 60);
+}
+
+function formatSeconds(sec){
+  sec=Math.max(0,Math.ceil(sec));
+  const m=String(Math.floor(sec/60)).padStart(2,'0');
+  const s=String(sec%60).padStart(2,'0');
+  return `${m}:${s}`;
+}
+
+function startHintCountdown(id, seconds){
+  const el=document.getElementById(id);
+  if(!el) return;
+  let remain=Math.max(0,Math.ceil(seconds));
+  el.textContent=formatSeconds(remain);
+  el.classList.remove('ready');
+  const timer=setInterval(()=>{
+    remain-=1;
+    const node=document.getElementById(id);
+    if(!node){ clearInterval(timer); return; }
+    if(remain<=0){
+      node.textContent='READY';
+      node.classList.add('ready');
+      clearInterval(timer);
+    } else {
+      node.textContent=formatSeconds(remain);
+    }
+  },1000);
 }
 
 function nextCase(){
@@ -1034,12 +1158,12 @@ function requestPlanHint(){
   const attempts=state.planAttempts[c.id]||0;
   if(attempts<3){ out.innerHTML=`<div class="timedHintPanel lockedHint"><b>Hints are still locked.</b> Try the evidence first. Hints unlock after 3 incorrect attempts.</div>`; return; }
   const key='plan_'+c.id; const rec=state.planHints[key] || {shown:0,last:0}; const now=Date.now(); const wait=60000-(now-(rec.last||0));
-  if(rec.shown>0 && wait>0){ const sec=Math.ceil(wait/1000); const tid=`planHintTimer_${c.id}_${Date.now()}`; out.innerHTML=`<div class="timedHintPanel lockedHint"><b>Hint locked.</b> Next plan hint opens in <span id="${tid}" class="hintCountdown">${sec}</span>.</div>`; startHintCountdown(tid, sec); return; }
+  if(rec.shown>0 && wait>0){ const sec=Math.ceil(wait/1000); const tid=`planHintTimer_${c.id}_${Date.now()}`; out.innerHTML=`<div class="timedHintPanel lockedHint"><span class="hourglass">⌛</span><b>Hint locked.</b> Next plan hint opens in <span id="${tid}" class="hintCountdown">${formatSeconds(sec)}</span>.</div>`; startHintCountdown(tid, sec); return; }
   const hints=getPlanHints(c);
   if(rec.shown>=hints.length){ out.innerHTML=`<div class="timedHintPanel"><b>No more hints.</b> You have all five plan clues. Match the plan rule to the next action.</div>`; return; }
   const hint=hints[rec.shown]; rec.shown+=1; rec.last=now; state.planHints[key]=rec; save();
   const tid=`planHintTimer_${c.id}_${Date.now()}`;
-  out.innerHTML=`<div class="timedHintPanel"><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. Use this minute to test the plan rule before requesting another clue.</span></div>`;
+  out.innerHTML=`<div class="timedHintPanel"><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. Use this minute to test the plan rule before requesting another clue.</span></div>`;
   startHintCountdown(tid, 60);
 }
 function sendPlanDecision(){
