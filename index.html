@@ -822,7 +822,7 @@
       <div class="grid">
         <div class="card span12">
           <h2>Plan Decision Lab: What Will the Insurance Do?</h2>
-          <p>Now investigate the insurance plan itself. Read the plan evidence, choose the plan type, identify the rule that matters, predict what happens, and decide the next action. After three incorrect attempts, the hint button unlocks. Hints come one at a time so you have to think between attempts.</p>
+          <p>Now investigate the insurance plan itself. The file will not simply name the plan type for you. Read the access rules, payment language, referral clues, deductible clues, and authorization clues. Then decide: What type of plan is this, what rule controls the claim, what will the payer likely do, and what should billing do next?</p>
           <div class="activityNav" id="planNav"></div>
         </div>
         <div class="card span12 caseActivityCard" id="planCasePanel"></div>
@@ -1353,11 +1353,39 @@ function nextActivity(){ const i=activityCases.findIndex(x=>x.id===currentActivi
 
 /* ------------------------- Plan Decision Lab: PPO, HMO, High Deductible ------------------------- */
 const planCases = [
-  {id:'P1', patient:'Nadia Brooks', facts:`The patient has an HMO plan. She saw an orthopedic specialist for knee pain. The claim includes the specialist office visit and diagnosis for knee pain. The chart does not show a PCP referral on file. The service itself is covered when the referral requirement is met.`, correct:{plan:'HMO', rule:'Referral required before specialist visit', decision:'DENIED', action:'Obtain referral/support and appeal or correct according to payer rule'}, hint:'HMO plans commonly require the PCP/referral pathway for specialist care. If the payer processed the claim and refused payment because the rule was not met, that is denial logic.', letter:'The payer denied the claim because the specialist visit lacked required referral support.'},
-  {id:'P2', patient:'Marco Silva', facts:`The patient has a PPO plan. He saw an in-network pulmonologist for shortness of breath. No PCP referral is required. The visit is covered, but the plan has a $40 specialist copay. The diagnosis supports the visit.`, correct:{plan:'PPO', rule:'Referral not required for in-network specialist, but copay applies', decision:'APPROVED / PAID', action:'Submit/process the clean claim and collect/apply copay per policy'}, hint:'PPO does not automatically mean free. It usually gives more flexibility, but copay/coinsurance rules can still apply.', letter:'The claim is clean. The payer can process the visit; patient cost-sharing still applies.'},
-  {id:'P3', patient:'Aisha Khan', facts:`The patient has a high-deductible health plan. She had an office visit for acute sinus symptoms. The allowed amount is $145. The deductible has not been met. The diagnosis supports the service and the provider is in network.`, correct:{plan:'High-Deductible Health Plan', rule:'Allowed amount applies to deductible before insurance pays', decision:'PROCESSED — PATIENT RESPONSIBILITY', action:'Post allowed amount to deductible/patient responsibility'}, hint:'A high deductible case is not automatically a denial. If the service is covered and allowed, the payer may process it with patient responsibility.', letter:'The claim was processed. Payment may be $0 from insurance because the allowed amount applies to the unmet deductible.'},
-  {id:'P4', patient:'Liam Chen', facts:`The patient has a PPO plan. The provider ordered an MRI for back pain. The plan requires prior authorization for advanced imaging over $500. The documentation supports the symptom, but no authorization number is present on the claim.`, correct:{plan:'PPO', rule:'Prior authorization required for advanced imaging', decision:'DENIED', action:'Appeal or submit authorization/documentation support according to payer policy'}, hint:'Even PPO plans can require prior authorization for expensive imaging or procedures. This is not a simple copay issue.', letter:'The payer denied the imaging claim because the prior authorization requirement was not documented/met.'}
-];
+  {
+    id:'P1',
+    patient:'Nadia Brooks',
+    facts:`Plan file: Member ID verified. Card lists an assigned primary clinician and a selected network clinic. Specialist visits are routed through that clinician unless urgent/emergency care applies. Today the patient went to orthopedics for knee pain. The chart has the diagnosis and specialist note, but no referral order, referral number, or documented transfer from the assigned primary clinician. Determine whether the payer should process payment, deny, reject, or shift responsibility.`,
+    correct:{plan:'Health Maintenance Organization (HMO)', rule:'Specialist access depends on assigned primary-care referral', decision:'DENIED', action:'Appeal only if referral/support can be documented; otherwise correct according to payer rule'},
+    hint:'This plan controls access through a selected primary clinician. The missing item is not the diagnosis; it is the permission pathway before the specialist visit.',
+    letter:'The payer processed the specialist claim and refused payment because the required referral support was not documented.'
+  },
+  {
+    id:'P2',
+    patient:'Marco Silva',
+    facts:`Plan file: Member may schedule with participating specialists without an order from a primary clinician. Network lookup shows the pulmonology office is participating. The benefit grid lists a fixed specialist visit amount due from the patient at the visit. The patient was seen for shortness of breath; the diagnosis supports the encounter. No referral number appears because the plan design does not require one for this type of in-network specialist visit. Determine the expected payer result and what should happen next.`,
+    correct:{plan:'Preferred Provider Organization (PPO)', rule:'In-network specialist can be seen without referral, but visit cost-sharing applies', decision:'APPROVED / PAID', action:'Submit/process the claim and apply the specialist cost-sharing rule'},
+    hint:'This plan gives more freedom to see participating specialists. More access does not mean the visit is free; cost-sharing still matters.',
+    letter:'The payer can process the claim because the specialist is in network and the visit is supported. Patient cost-sharing still applies.'
+  },
+  {
+    id:'P3',
+    patient:'Aisha Khan',
+    facts:`Plan file: Member has a large annual amount that must be satisfied before the plan begins paying many non-preventive services. Eligibility response shows $0 met so far. Provider is participating. Office visit is for acute sinus symptoms and the diagnosis supports the service. Allowed amount is $145. There is no referral issue and no authorization issue. Determine whether this is a denial, rejection, payment, or patient-responsibility situation.`,
+    correct:{plan:'High-Deductible Health Plan (HDHP)', rule:'Allowed amount applies to deductible before insurance payment begins', decision:'PROCESSED — PATIENT RESPONSIBILITY', action:'Post the allowed amount to deductible/patient responsibility'},
+    hint:'Do not confuse “insurance paid $0” with “denied.” If the claim is allowed but the annual amount is not met, the patient may owe the allowed amount.',
+    letter:'The claim was processed. Insurance payment may be $0 because the allowed amount applies to the unmet deductible.'
+  },
+  {
+    id:'P4',
+    patient:'Liam Chen',
+    facts:`Plan file: Member may use network providers with flexible access, but expensive imaging requires approval before the test is performed. Provider ordered lumbar MRI for back pain. The clinical note explains symptoms, but the claim does not include an approval number and the chart does not show an authorization approval message. Determine the plan type, controlling rule, expected payer result, and billing next action.`,
+    correct:{plan:'Preferred Provider Organization (PPO)', rule:'Prior authorization required before advanced imaging', decision:'DENIED', action:'Appeal or submit authorization/documentation support according to payer policy'},
+    hint:'Flexible specialist access does not remove every rule. For high-cost imaging, the payer may require approval before the service.',
+    letter:'The payer denied the imaging claim because the prior authorization requirement was not documented as met.'
+  }
+]
 let currentPlan = state.currentPlan || 'P1';
 if(!state.planAnswers) state.planAnswers = {};
 if(!state.planDone) state.planDone = {};
@@ -1365,23 +1393,24 @@ if(!state.planAttempts) state.planAttempts = {};
 if(!state.planHints) state.planHints = {};
 function renderPlans(){
   const c=planCases.find(x=>x.id===currentPlan); const saved=state.planAnswers[c.id]||{};
-  const planOptions=['PPO','HMO','High-Deductible Health Plan','Medicaid Managed Care','Medicare Advantage'];
-  const ruleOptions=['Referral required before specialist visit','Referral not required for in-network specialist, but copay applies','Allowed amount applies to deductible before insurance pays','Prior authorization required for advanced imaging','Coinsurance starts before deductible is considered','Premium determines whether the claim is paid today'];
+  const planOptions=['Preferred Provider Organization (PPO)','Health Maintenance Organization (HMO)','High-Deductible Health Plan (HDHP)','Medicaid Managed Care','Medicare Advantage'];
+  const ruleOptions=['Specialist access depends on assigned primary-care referral','In-network specialist can be seen without referral, but visit cost-sharing applies','Allowed amount applies to deductible before insurance payment begins','Prior authorization required before advanced imaging','Coinsurance starts before deductible is considered','Premium determines whether the claim is paid today'];
   const decisionOptions=['APPROVED / PAID','DENIED','REJECTED','PROCESSED — PATIENT RESPONSIBILITY','PENDED FOR MISSING PATIENT PHONE'];
-  const actionOptions=['Submit/process the clean claim and collect/apply copay per policy','Obtain referral/support and appeal or correct according to payer rule','Post allowed amount to deductible/patient responsibility','Appeal or submit authorization/documentation support according to payer policy','Bill the full provider charge without payer processing'];
+  const actionOptions=['Submit/process the claim and apply the specialist cost-sharing rule','Appeal only if referral/support can be documented; otherwise correct according to payer rule','Post the allowed amount to deductible/patient responsibility','Appeal or submit authorization/documentation support according to payer policy','Bill the full provider charge without payer processing'];
   $('#planNav').innerHTML=planCases.map(x=>`<button class="activityBtn ${x.id===currentPlan?'active':''} ${state.planDone[x.id]?'done':''}" onclick="selectPlan('${x.id}')"><b>Plan File ${x.id.replace('P','')}</b><br><span class="mini">${state.planDone[x.id]?'Completed':'Needs decision'}</span></button>`).join('');
   $('#planCasePanel').innerHTML=`<h2>Plan File ${c.id.replace('P','')}</h2><p><b>Patient:</b> ${c.patient}</p><div class="soapBlock">${c.facts}</div>`;
   $('#planWorkPanel').innerHTML=`<h2>Plan Rule Decision</h2><div class="miniForm"><div><label>Plan type</label><select id="pPlan">${selectOptions(planOptions,saved.plan||'', c.id+'_plan')}</select></div><div><label>Rule that controls the claim</label><select id="pRule">${selectOptions(ruleOptions,saved.rule||'', c.id+'_rule')}</select></div><div><label>Expected result</label><select id="pDecision">${selectOptions(decisionOptions,saved.decision||'', c.id+'_decision')}</select></div><div><label>Best next action</label><select id="pAction">${selectOptions(actionOptions,saved.action||'', c.id+'_action')}</select></div><div style="grid-column:1/-1"><label>Explain your plan reasoning</label><textarea id="pExplain" placeholder="Explain which plan rule controls the claim and why the payer would pay, deny, reject, or shift responsibility.">${escapeHtml(saved.explanation||'')}</textarea></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="sendPlanDecision()">Send Plan Decision</button><button class="btn gold" onclick="requestPlanHint()">Request Timed Hint</button></div><div id="planHintSlot" class="planResultLarge"></div><div id="planSendResult" class="planResultLarge"></div></div>`;
 }
 function selectPlan(id){ currentPlan=id; state.currentPlan=id; save(); renderPlans(); beep('click'); }
 function getPlanHints(c){
-  return [
-    'Identify the plan type first. The plan type tells you what rule system the payer is likely using.',
-    'Separate access rules from payment rules. Referral, prior authorization, deductible, copay, and coinsurance are not the same thing.',
-    'Ask whether the claim is structurally incomplete, processed but refused, approved, or processed with patient responsibility.',
-    'For HMO and prior authorization cases, look for missing permission/support before the service, not just the diagnosis.',
-    'For PPO and high-deductible cases, remember: flexible access does not mean no patient cost-sharing.'
+  const base = [
+    'Hint 1: First separate the access rule from the payment rule. Is the issue about permission to receive the service, or about who pays after the claim is processed?',
+    'Hint 2: Look for clues such as assigned primary clinician, participating specialist, annual deductible amount, or approval number. Those words reveal the plan type without naming it directly.',
+    'Hint 3: A missing referral or missing authorization usually creates denial logic after payer review. An invalid ID or missing required field would be rejection logic.',
+    'Hint 4: If the service is allowed but the deductible is unmet, that is usually processed as patient responsibility. It is not the same as a denial.',
+    'Hint 5: Strong clue: assigned primary clinician + specialist route points to HMO referral logic; flexible network specialist access points to PPO; large annual amount before payment points to HDHP; approval before MRI points to prior authorization.'
   ];
+  return base;
 }
 function requestPlanHint(){
   const c=planCases.find(x=>x.id===currentPlan); const out=$('#planHintSlot') || $('#planSendResult'); beep('click');
