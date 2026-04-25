@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clean Claim Command Center</title>
+  <style>
+    :root{
+      --navy:#0f2544; --teal:#00a6a6; --violet:#6d5dfc; --coral:#ff6b6b; --gold:#f7b731;
+      --mint:#e9fffb; --lav:#f2efff; --rose:#fff0f0; --ink:#172033; --muted:#617083;
+      --green:#14b86a; --red:#e5484d; --orange:#f59e0b; --blue:#2563eb;
+      --shadow:0 18px 45px rgba(15,37,68,.14); --soft:0 8px 22px rgba(15,37,68,.10);
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:Inter,Segoe UI,Arial,sans-serif;color:var(--ink);background:
+      radial-gradient(circle at 15% 10%, rgba(0,166,166,.14), transparent 32%),
+      radial-gradient(circle at 82% 0%, rgba(109,93,252,.16), transparent 30%),
+      linear-gradient(180deg,#fff 0%,#f7fbff 100%);min-height:100vh;}
+    header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.86);backdrop-filter:blur(14px);border-bottom:1px solid rgba(15,37,68,.08)}
+    .wrap{max-width:1220px;margin:0 auto;padding:18px}
+    .top{display:flex;gap:14px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+    .brand{display:flex;gap:12px;align-items:center}.logo{width:48px;height:48px;border-radius:18px;background:linear-gradient(135deg,var(--teal),var(--violet));box-shadow:var(--soft);display:grid;place-items:center;color:#fff;font-weight:900;font-size:22px}
+    h1{font-size:clamp(24px,3vw,42px);line-height:1.05;margin:0;color:var(--navy)}
+    .subtitle{margin:4px 0 0;color:var(--muted);font-weight:600}.pill{border:1px solid rgba(15,37,68,.10);background:rgba(255,255,255,.65);border-radius:999px;padding:8px 12px;font-weight:800;color:var(--navy)}
+    .nav{display:flex;gap:8px;overflow:auto;padding:10px 18px 16px;max-width:1220px;margin:0 auto}.tab{border:none;border-radius:999px;padding:12px 16px;background:#fff;color:var(--navy);font-weight:900;box-shadow:var(--soft);cursor:pointer;white-space:nowrap;transition:.2s}.tab.active{background:linear-gradient(135deg,var(--navy),var(--violet));color:#fff}.tab:hover{transform:translateY(-2px)}
+    .controls{display:flex;gap:8px;flex-wrap:wrap}.btn{border:none;border-radius:16px;padding:12px 16px;font-weight:900;cursor:pointer;transition:.2s;box-shadow:var(--soft);background:#fff;color:var(--navy)}.btn:hover{transform:translateY(-2px)}.btn.primary{background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff}.btn.coral{background:linear-gradient(135deg,var(--coral),#ff9f43);color:#fff}.btn.gold{background:linear-gradient(135deg,var(--gold),#ffd166);color:#301b00}.btn.navy{background:var(--navy);color:#fff}.btn.small{padding:8px 10px;border-radius:12px;font-size:13px}
+    main{max-width:min(1600px,96vw);margin:0 auto;padding:18px}.page{display:none;animation:fade .35s ease}.page.active{display:block}@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:16px}.card{background:rgba(255,255,255,.82);border:1px solid rgba(15,37,68,.10);box-shadow:var(--shadow);border-radius:28px;padding:22px;backdrop-filter:blur(12px);overflow:hidden}.span12{grid-column:span 12}.span8{grid-column:span 8}.span6{grid-column:span 6}.span4{grid-column:span 4}.span3{grid-column:span 3}
+    @media(max-width:900px){.span8,.span6,.span4,.span3{grid-column:span 12}.top{align-items:flex-start}.controls{width:100%}.btn{flex:1}.caseShell{grid-template-columns:1fr!important}}
+    h2{font-size:clamp(22px,2.4vw,34px);margin:0 0 10px;color:var(--navy)}h3{margin:0 0 10px;color:var(--navy)}p{line-height:1.55}.callout{border-left:6px solid var(--teal);background:linear-gradient(90deg,var(--mint),#fff);padding:16px;border-radius:18px;margin:12px 0}.warning{border-left-color:var(--orange);background:linear-gradient(90deg,#fff7e6,#fff)}.danger{border-left-color:var(--red);background:linear-gradient(90deg,#fff0f0,#fff)}
+    .flow{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.flow span{background:#fff;border:1px solid rgba(15,37,68,.10);border-radius:16px;padding:12px 14px;font-weight:900;box-shadow:var(--soft)}.arrow{color:var(--violet);font-weight:900;font-size:22px}.mini{font-size:13px;color:var(--muted);font-weight:750}.stat{border-radius:22px;padding:16px;background:linear-gradient(135deg,#fff,var(--lav));border:1px solid rgba(109,93,252,.15)}.stat b{display:block;font-size:28px;color:var(--navy)}
+    .progressOuter{height:14px;background:#e8eef8;border-radius:999px;overflow:hidden}.progressInner{height:100%;width:0%;background:linear-gradient(90deg,var(--teal),var(--violet),var(--gold));transition:.5s}.reviewChip{display:inline-flex;gap:8px;align-items:center;margin:6px;padding:10px 12px;background:#fff;border-radius:999px;border:1px solid rgba(15,37,68,.12);font-weight:900;box-shadow:var(--soft)}
+    .caseSelect{display:flex;gap:10px;overflow:auto;padding-bottom:8px}.caseBtn{min-width:178px;text-align:left;border:1px solid rgba(15,37,68,.12);background:#fff;border-radius:20px;padding:14px;box-shadow:var(--soft);cursor:pointer}.caseBtn.active{outline:3px solid rgba(0,166,166,.25);background:linear-gradient(135deg,#fff,var(--mint))}.caseBtn.done{border-color:rgba(20,184,106,.5)}.badge{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}.badge.clean{background:#dcfce7;color:#166534}.badge.trap{background:#ffedd5;color:#9a3412}.badge.mod{background:#ede9fe;color:#5b21b6}
+    .caseShell{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}.soap{max-height:680px;overflow:auto}.soapBlock{background:#fff;border:1px solid rgba(15,37,68,.08);border-radius:18px;padding:14px;margin:10px 0}.soapBlock strong{color:var(--navy)}
+    label{font-weight:900;color:var(--navy);display:block;margin:13px 0 6px}select,textarea,input[type=text]{width:100%;border:2px solid #dbe5f3;border-radius:16px;padding:12px;background:#fff;font-size:15px;color:var(--ink)}select:focus,textarea:focus,input:focus{outline:3px solid rgba(0,166,166,.18);border-color:var(--teal)}textarea{min-height:82px;resize:vertical}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}@media(max-width:700px){.two{grid-template-columns:1fr}}
+    .claimTrack{margin:14px 0;padding:18px;border-radius:24px;background:linear-gradient(135deg,#f8fbff,#fff);border:1px dashed rgba(15,37,68,.18);position:relative;min-height:84px;overflow:hidden}.claimPacket{position:absolute;left:14px;top:22px;width:58px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#fff0a6);box-shadow:var(--soft);display:grid;place-items:center;font-weight:900;color:#513400}.claimPacket.fly{animation:fly 1.6s ease forwards}@keyframes fly{0%{left:14px;transform:rotate(-4deg)}48%{left:46%;transform:rotate(3deg)}100%{left:calc(100% - 76px);transform:rotate(0)}}.stations{display:flex;justify-content:space-between;font-weight:900;color:var(--muted);font-size:13px;margin-top:54px}.stamp{display:none;position:absolute;right:24px;top:14px;transform:rotate(-10deg);font-size:25px;font-weight:1000;border:5px solid currentColor;border-radius:14px;padding:8px 12px;background:rgba(255,255,255,.75)}.stamp.show{display:block;animation:stamp .25s ease}@keyframes stamp{from{transform:scale(2) rotate(-10deg);opacity:0}to{transform:scale(1) rotate(-10deg);opacity:1}}
+    .result{display:none;border-radius:24px;padding:18px;margin-top:12px}.result.show{display:block}.result.paid{background:#ecfdf5;border:2px solid #86efac}.result.rejected{background:#fff7ed;border:2px solid #fdba74}.result.denied{background:#fef2f2;border:2px solid #fca5a5}.result h3{font-size:26px}.fixList{display:grid;gap:8px;margin-top:10px}.fixOption{padding:12px;border-radius:16px;border:1px solid rgba(15,37,68,.10);background:#fff;cursor:pointer;font-weight:850;text-align:left}.fixOption:hover{background:var(--mint)}
+    .refGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(max-width:700px){.refGrid{grid-template-columns:1fr}}.refItem{background:#fff;border-radius:16px;border:1px solid rgba(15,37,68,.10);padding:12px}.refItem b{color:var(--violet)}
+    .teacher{display:none!important}.mastery{display:flex;gap:10px;flex-wrap:wrap}.mastery span{background:#fff;border-radius:999px;padding:8px 10px;font-weight:900;border:1px solid rgba(15,37,68,.10)}
+    .confetti{position:fixed;inset:0;pointer-events:none;z-index:99}.piece{position:absolute;width:10px;height:18px;border-radius:2px;animation:fall 1.8s linear forwards}@keyframes fall{to{transform:translateY(110vh) rotate(720deg);opacity:.2}}
+    .activityNav{display:flex;gap:10px;overflow:auto;padding:8px 0 14px}.activityBtn{min-width:150px;border:none;border-radius:18px;padding:13px;background:#fff;box-shadow:var(--soft);font-weight:950;color:var(--navy);cursor:pointer;text-align:left}.activityBtn.active{background:linear-gradient(135deg,var(--teal),var(--violet));color:#fff}.activityBtn.done{outline:3px solid rgba(20,184,106,.25)}
+    .issueGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}@media(max-width:800px){.issueGrid{grid-template-columns:1fr}}
+    .choiceCard{border:2px solid #dbe5f3;background:#fff;border-radius:18px;padding:14px;text-align:left;cursor:pointer;font-weight:850;transition:.2s}.choiceCard:hover{transform:translateY(-2px);box-shadow:var(--soft)}.choiceCard.selected{border-color:var(--violet);background:var(--lav)}.decisionBanner{border-radius:22px;padding:16px;margin:14px 0;background:linear-gradient(135deg,#fff,var(--mint));border:1px solid rgba(0,166,166,.22)}
+    .miniForm{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:16px;width:100%}@media(max-width:1100px){.miniForm{grid-template-columns:repeat(2,1fr)}}@media(max-width:800px){.miniForm{grid-template-columns:1fr}}
+    .caseActivityCard{min-height:320px;font-size:18px;width:100%}.caseActivityCard .soapBlock{font-size:18px;line-height:1.75}.activityWorkWide{min-height:720px;width:100%;padding:32px}.activityStatusStamp{display:inline-block;border:8px solid currentColor;border-radius:24px;padding:16px 26px;font-size:clamp(38px,6vw,82px);font-weight:1000;letter-spacing:3px;transform:rotate(-4deg);background:rgba(255,255,255,.9);box-shadow:var(--shadow);margin:14px 0}.activityStatusStamp.paid{color:var(--green)}.activityStatusStamp.denied{color:var(--red)}.activityStatusStamp.rejected{color:var(--orange)}.activityStatusStamp.pended{color:var(--blue)}.activityClaimTrack{min-height:360px;width:100%;border-width:4px;background:linear-gradient(135deg,#ffffff,#eef9ff);box-shadow:inset 0 0 0 1px rgba(15,37,68,.05)}.activityClaimTrack .claimPacket{width:118px;height:76px;font-size:25px;top:58px;border:3px solid rgba(81,52,0,.15)}.activityClaimTrack .stations{font-size:20px;margin-top:245px}.activityClaimTrack .stamp{font-size:clamp(56px,8vw,118px);right:58px;top:75px;border-width:10px}.activityClaimTrack .claimPacket.fly{animation:fly 2.8s ease-in-out forwards}.paidLetter{margin-top:18px;border:3px solid #86efac;border-radius:24px;background:linear-gradient(135deg,#fff,#ecfdf5);padding:20px;font-size:18px;box-shadow:var(--soft)}.paidLetter h3{color:var(--green);font-size:30px;margin-bottom:8px}.paidLetter .letterLine{border-top:1px solid rgba(20,184,106,.25);padding-top:10px;margin-top:10px}.hintBox{background:#fffbeb;border:3px solid #fcd34d;border-radius:24px;padding:18px;margin-top:16px;font-size:17px}.planResultLarge{grid-column:1/-1;width:100%}
+    .claimDone{background:#ecfdf5;border:3px solid #86efac;border-radius:28px;padding:24px;margin-top:18px;font-size:18px}.claimWrong{background:#fff7ed;border:3px solid #fdba74;border-radius:28px;padding:24px;margin-top:18px;font-size:18px}.explainBox{margin:18px 0;padding:16px;border-radius:20px;background:linear-gradient(135deg,#fff,#f4f7ff);border:2px solid #dbe5f3}.fullClaimResult{grid-column:1/-1;width:100%;margin-top:16px}.firework{font-size:34px;display:inline-block;animation:pop .75s ease infinite alternate}@keyframes pop{from{transform:scale(.9) rotate(-8deg)}to{transform:scale(1.15) rotate(8deg)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}35%{transform:translateX(-5px)}70%{transform:translateX(5px)}}
+
+
+    /* Chic branded polish */
+    header{background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(242,239,255,.86),rgba(233,255,251,.88));box-shadow:0 14px 40px rgba(15,37,68,.10)}
+    header:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 8% 20%,rgba(0,166,166,.18),transparent 28%),radial-gradient(circle at 70% 0,rgba(247,183,49,.18),transparent 30%);pointer-events:none}
+    header .wrap, header .nav{position:relative;z-index:1}
+    .brand .logo{width:58px;height:58px;border-radius:22px;background:linear-gradient(135deg,#0f2544,#00a6a6 45%,#6d5dfc);box-shadow:0 16px 35px rgba(109,93,252,.26);letter-spacing:.5px}
+    .subtitle{color:#31425a}.brandCredit{margin-top:7px;display:inline-flex;gap:8px;align-items:center;border-radius:999px;padding:7px 12px;background:rgba(255,255,255,.72);border:1px solid rgba(109,93,252,.20);box-shadow:var(--soft);font-size:13px;font-weight:950;color:var(--navy)}
+    .brandCredit:before{content:"◆";color:var(--teal);font-size:10px}.card{background:linear-gradient(135deg,rgba(255,255,255,.84),rgba(248,251,255,.78));box-shadow:0 24px 58px rgba(15,37,68,.13), inset 0 1px 0 rgba(255,255,255,.85)}
+    #formPanel,.activityWorkWide,#planWorkPanel{background:linear-gradient(135deg,rgba(255,255,255,.88),rgba(242,239,255,.58),rgba(233,255,251,.58));border:1px solid rgba(109,93,252,.16)}
+    .copyrightFooter{max-width:min(1600px,96vw);margin:20px auto 36px;padding:18px 22px;border-radius:26px;background:rgba(255,255,255,.72);border:1px solid rgba(15,37,68,.10);box-shadow:var(--soft);color:var(--navy);font-weight:850;text-align:center;backdrop-filter:blur(10px)}
+    .mainClaimTrack{min-height:260px;width:100%;border:4px dashed rgba(109,93,252,.26);background:linear-gradient(135deg,#ffffff,#effcff 48%,#f5f2ff);box-shadow:inset 0 0 0 1px rgba(15,37,68,.05),0 15px 35px rgba(15,37,68,.08)}
+    .mainClaimTrack .claimPacket{width:116px;height:76px;top:58px;border-radius:18px;font-size:25px;border:3px solid rgba(81,52,0,.14)}
+    .mainClaimTrack .claimPacket.fly{animation:flyMain 3.4s cubic-bezier(.22,.85,.25,1) forwards}
+    @keyframes flyMain{0%{left:18px;transform:rotate(-5deg) scale(.96)}38%{left:44%;transform:rotate(3deg) scale(1.05)}68%{left:62%;transform:rotate(-2deg) scale(1.02)}100%{left:calc(100% - 140px);transform:rotate(0) scale(1)}}
+    .mainClaimTrack .stations{font-size:19px;margin-top:190px;color:var(--navy)}
+    .mainClaimTrack .stamp{font-size:clamp(42px,6vw,86px);right:42px;top:72px;border-width:9px;background:rgba(255,255,255,.88)}
+    #resultBox.result.show{font-size:18px;padding:24px;border-width:3px;box-shadow:var(--shadow)}
+    #resultBox.result.show h3{font-size:clamp(28px,3vw,46px)}
+    .timedHintPanel{margin-top:14px;padding:16px;border-radius:22px;background:linear-gradient(135deg,#fff8e1,#fff);border:2px solid #fcd34d;box-shadow:var(--soft)}
+    .timedHintPanel b{color:#7c4a03}.lockedHint{opacity:.78;font-weight:850;color:var(--muted)}.hintCountdown{display:inline-flex;align-items:center;justify-content:center;min-width:86px;margin-left:8px;padding:6px 10px;border-radius:999px;background:linear-gradient(135deg,#111827,#334155);color:white;font-weight:1000;font-variant-numeric:tabular-nums;box-shadow:0 8px 20px rgba(15,23,42,.18)}.hintCountdown.ready{background:linear-gradient(135deg,#16a34a,#22c55e)}
+
+
+
+    /* Revision: stretch the Five-Case Claim Lab vertically so the SOAP case stays on top and the CMS claim workspace fills the page below. */
+    #lab .caseShell{
+      display:grid;
+      grid-template-columns:1fr!important;
+      gap:24px;
+      margin-top:18px;
+    }
+    #lab #soapPanel{
+      width:100%;
+      max-height:none;
+      overflow:visible;
+      background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(233,255,251,.58));
+    }
+    #lab #formPanel{
+      width:100%;
+      min-height:980px;
+      padding:32px;
+      background:linear-gradient(135deg,rgba(255,255,255,.92),rgba(242,239,255,.62),rgba(233,255,251,.62));
+    }
+    #lab #formPanel .two{
+      grid-template-columns:repeat(2,minmax(260px,1fr));
+    }
+    #lab #formPanel select,
+    #lab #formPanel textarea,
+    #lab #formPanel input[type=text]{
+      font-size:17px;
+      padding:15px 16px;
+      border-radius:18px;
+    }
+    #lab #formPanel label{
+      font-size:16px;
+      margin-top:16px;
+    }
+    .mainClaimTrack{
+      min-height:640px!important;
+      width:min(860px,94%)!important;
+      margin:28px auto 20px!important;
+      border-width:5px!important;
+      border-radius:34px!important;
+      background:
+        radial-gradient(circle at 12% 16%,rgba(0,166,166,.15),transparent 30%),
+        radial-gradient(circle at 88% 80%,rgba(109,93,252,.18),transparent 34%),
+        linear-gradient(135deg,#ffffff,#effcff 48%,#f5f2ff)!important;
+    }
+    .mainClaimTrack:before{
+      content:'CMS-1500 Claim Journey';
+      position:absolute;
+      left:28px;
+      top:24px;
+      font-weight:1000;
+      color:var(--navy);
+      font-size:22px;
+      letter-spacing:.2px;
+    }
+    .mainClaimTrack:after{
+      content:'';
+      position:absolute;
+      left:90px;
+      right:120px;
+      top:330px;
+      height:0;
+      border-top:7px dashed rgba(109,93,252,.28);
+      border-right:none;
+      border-radius:0;
+      pointer-events:none;
+    }
+    .mainClaimTrack .claimPacket{
+      width:148px!important;
+      height:94px!important;
+      top:286px!important;
+      font-size:30px!important;
+      border-radius:24px!important;
+      z-index:2;
+    }
+    .mainClaimTrack .claimPacket.fly{
+      animation:flyMainLong 5.4s cubic-bezier(.22,.85,.25,1) forwards!important;
+    }
+    @keyframes flyMainLong{
+      0%{left:34px;top:286px;transform:rotate(-4deg) scale(.96)}
+      25%{left:25%;top:286px;transform:rotate(2deg) scale(1.03)}
+      50%{left:49%;top:286px;transform:rotate(-1deg) scale(1.05)}
+      75%{left:68%;top:286px;transform:rotate(1deg) scale(1.02)}
+      100%{left:calc(100% - 186px);top:286px;transform:rotate(0) scale(1)}
+    }
+    .mainClaimTrack .stations{
+      position:absolute;
+      left:30px;
+      right:30px;
+      bottom:28px;
+      margin-top:0!important;
+      font-size:22px!important;
+      color:var(--navy)!important;
+      z-index:1;
+    }
+    .mainClaimTrack .stamp{
+      top:210px!important;
+      right:62px!important;
+      font-size:clamp(56px,7.5vw,120px)!important;
+      border-width:11px!important;
+      border-radius:24px!important;
+      padding:14px 22px!important;
+      background:rgba(255,255,255,.92)!important;
+      box-shadow:var(--shadow)!important;
+      z-index:3;
+    }
+    #resultBox.result.show{
+      margin-top:24px;
+      padding:30px!important;
+      border-radius:30px!important;
+    }
+    @media(max-width:800px){
+      #lab #formPanel{min-height:900px;padding:22px}
+      #lab #formPanel .two{grid-template-columns:1fr}
+      .mainClaimTrack{min-height:520px!important;width:96%!important}
+      .mainClaimTrack .claimPacket{width:120px!important;height:78px!important;font-size:24px!important}
+      .mainClaimTrack .stations{font-size:15px!important;bottom:20px}
+      .mainClaimTrack .stamp{right:22px!important;top:160px!important;font-size:42px!important}
+      @keyframes flyMainLong{
+        0%{left:18px;top:110px;transform:rotate(-6deg) scale(.96)}
+        35%{left:38%;top:170px;transform:rotate(3deg) scale(1.04)}
+        70%{left:54%;top:340px;transform:rotate(-2deg) scale(1.06)}
+        100%{left:calc(100% - 136px);top:390px;transform:rotate(0) scale(1)}
+      }
+    }
+
+
+    /* Final correction: long horizontal claim journey, narrow height, aligned with the form width. */
+    #lab #formPanel{
+      max-width:1120px!important;
+      margin:0 auto!important;
+      width:100%!important;
+      min-height:auto!important;
+    }
+    #lab #formPanel .two{
+      grid-template-columns:1fr 1fr!important;
+    }
+    .claimActionBar{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:20px 0 14px;
+      padding:10px;
+      border-radius:22px;
+      background:rgba(255,255,255,.82);
+      border:1px solid rgba(15,37,68,.08);
+      backdrop-filter:blur(10px);
+      box-shadow:var(--soft);
+    }
+    .claimActionBar .btn{min-width:180px;flex:0 1 220px}
+    .mainClaimTrack{
+      width:min(1080px,96vw)!important;
+      max-width:1080px!important;
+      min-height:235px!important;
+      height:235px!important;
+      margin:18px auto 22px!important;
+      border-radius:32px!important;
+      overflow:hidden!important;
+      background:
+        radial-gradient(circle at 12% 30%, rgba(0,166,166,.16), transparent 24%),
+        radial-gradient(circle at 78% 30%, rgba(109,93,252,.14), transparent 25%),
+        linear-gradient(135deg, rgba(255,255,255,.94), rgba(242,239,255,.86))!important;
+    }
+    .mainClaimTrack:before{
+      content:'CMS claim journey: clinic → clearinghouse → payer review'!important;
+      position:absolute;
+      top:18px!important;
+      left:26px!important;
+      right:auto!important;
+      font-size:18px!important;
+      font-weight:900!important;
+      color:var(--navy)!important;
+      background:rgba(255,255,255,.72)!important;
+      border:1px solid rgba(15,37,68,.08)!important;
+      border-radius:999px!important;
+      padding:8px 14px!important;
+      z-index:2;
+    }
+    .mainClaimTrack:after{
+      content:''!important;
+      position:absolute!important;
+      left:40px!important;
+      right:40px!important;
+      top:126px!important;
+      height:0!important;
+      width:auto!important;
+      border-top:7px dashed rgba(109,93,252,.38)!important;
+      border-left:none!important;
+      bottom:auto!important;
+      transform:none!important;
+      z-index:0;
+    }
+    .mainClaimTrack .claimPacket{
+      left:34px!important;
+      top:88px!important;
+      width:118px!important;
+      height:76px!important;
+      margin-left:0!important;
+      font-size:24px!important;
+      border-radius:18px!important;
+      z-index:3!important;
+      transition:box-shadow .3s ease, border-radius .3s ease!important;
+    }
+    .mainClaimTrack .claimPacket.letter{
+      border-radius:10px!important;
+      font-size:21px!important;
+      letter-spacing:.3px!important;
+      background:linear-gradient(135deg,#ffffff,#f2efff)!important;
+      box-shadow:0 18px 40px rgba(109,93,252,.25)!important;
+    }
+    .mainClaimTrack .claimPacket.letter::after{
+      content:'';
+      position:absolute;
+      left:12px; right:12px; top:15px;
+      height:28px;
+      border-bottom:3px solid rgba(15,37,68,.18);
+      transform:skewY(-18deg);
+      pointer-events:none;
+    }
+    .mainClaimTrack .claimPacket.fly{
+      animation:flyMainHorizontal 5.8s cubic-bezier(.22,.85,.25,1) forwards!important;
+    }
+    @keyframes flyMainHorizontal{
+      0%{left:34px;top:88px;transform:rotate(-5deg) scale(.96)}
+      25%{left:27%;top:88px;transform:rotate(2deg) scale(1.02)}
+      52%{left:52%;top:88px;transform:rotate(-1deg) scale(1.05)}
+      76%{left:72%;top:88px;transform:rotate(1deg) scale(1.02)}
+      100%{left:calc(100% - 172px);top:88px;transform:rotate(0) scale(1)}
+    }
+    .mainClaimTrack .stations{
+      position:absolute!important;
+      left:42px!important;
+      right:42px!important;
+      bottom:24px!important;
+      top:auto!important;
+      display:flex!important;
+      justify-content:space-between!important;
+      align-items:center!important;
+      font-size:16px!important;
+      margin:0!important;
+      color:var(--navy)!important;
+      z-index:2;
+    }
+    .mainClaimTrack .stations span{
+      position:static!important;
+      transform:none!important;
+      background:rgba(255,255,255,.88)!important;
+      border:1px solid rgba(15,37,68,.08)!important;
+      padding:8px 12px!important;
+      border-radius:999px!important;
+      box-shadow:var(--soft)!important;
+      font-weight:900!important;
+    }
+    .mainClaimTrack .stamp{
+      top:54px!important;
+      right:38px!important;
+      left:auto!important;
+      transform:rotate(-8deg)!important;
+      font-size:clamp(36px,5.2vw,82px)!important;
+      border-width:8px!important;
+      text-align:center!important;
+      max-width:45%!important;
+      z-index:4!important;
+      background:rgba(255,255,255,.92)!important;
+    }
+    .stamp.show{animation:stampHorizontal .28s ease!important}
+    @keyframes stampHorizontal{from{transform:scale(1.8) rotate(-8deg);opacity:0}to{transform:scale(1) rotate(-8deg);opacity:1}}
+    @media(max-width:800px){
+      #lab #formPanel .two{grid-template-columns:1fr!important}
+      .claimActionBar{position:static}.claimActionBar .btn{min-width:0;flex:1 1 150px}
+      .mainClaimTrack{width:96vw!important;min-height:220px!important;height:220px!important}
+      .mainClaimTrack:before{font-size:13px!important;left:12px!important;top:12px!important}
+      .mainClaimTrack:after{left:24px!important;right:24px!important;top:112px!important;border-top-width:5px!important}
+      .mainClaimTrack .claimPacket{width:88px!important;height:58px!important;font-size:18px!important;top:83px!important;left:22px!important}
+      .mainClaimTrack .claimPacket.letter{font-size:15px!important}
+      @keyframes flyMainHorizontal{0%{left:22px;top:83px;transform:rotate(-5deg) scale(.96)}35%{left:35%;top:83px;transform:rotate(2deg) scale(1.02)}70%{left:62%;top:83px;transform:rotate(-1deg) scale(1.05)}100%{left:calc(100% - 112px);top:83px;transform:rotate(0) scale(1)}}
+      .mainClaimTrack .stations{font-size:11px!important;left:18px!important;right:18px!important;bottom:14px!important}.mainClaimTrack .stations span{padding:6px 7px!important}
+      .mainClaimTrack .stamp{right:14px!important;top:44px!important;font-size:clamp(24px,10vw,44px)!important;max-width:58%!important}
+    }
+
+    @media print{header,.nav,.controls,.noPrint,.btn{display:none!important}body{background:#fff}.page{display:block}.card{box-shadow:none;border:1px solid #ccc}.soap{max-height:none}}
+  
+/* Visibility upgrade: make the CMS journey obviously move across a long narrow track. */
+.mainClaimTrack{position:relative!important;height:260px!important;min-height:260px!important;overflow:hidden!important;}
+.mainClaimTrack:after{display:none!important;}
+.mainClaimTrack .journeyLine{position:absolute;left:46px;right:46px;top:128px;height:12px;border-radius:999px;background:repeating-linear-gradient(90deg, rgba(109,93,252,.42) 0 18px, transparent 18px 30px);box-shadow:inset 0 0 0 1px rgba(15,37,68,.05);z-index:1;}
+.mainClaimTrack .journeyFill{position:absolute;left:0;top:0;bottom:0;width:0%;border-radius:999px;background:linear-gradient(90deg, rgba(0,166,166,.85), rgba(109,93,252,.85), rgba(245,158,11,.85));box-shadow:0 0 18px rgba(0,166,166,.28);}
+.mainClaimTrack.running .journeyFill{animation:journeyFillMove 7.2s linear forwards;}
+@keyframes journeyFillMove{0%{width:2%}42%{width:50%}72%{width:76%}100%{width:96%}}
+.mainClaimTrack.running .journeyLine{animation:dashFlow 1.1s linear infinite;}
+@keyframes dashFlow{to{background-position:30px 0}}
+.mainClaimTrack .claimPacket{box-shadow:0 18px 45px rgba(245,158,11,.35), 0 0 0 8px rgba(245,158,11,.13)!important;}
+.mainClaimTrack.running .claimPacket::before{content:'';position:absolute;left:-32px;top:50%;width:28px;height:8px;transform:translateY(-50%);border-radius:999px;background:linear-gradient(90deg, transparent, rgba(245,158,11,.7));}
+.mainClaimTrack .claimPacket.fly{animation:flyMainHorizontalVisible 7.2s cubic-bezier(.2,.82,.2,1) forwards!important;}
+@keyframes flyMainHorizontalVisible{0%{left:34px;top:90px;transform:rotate(-5deg) scale(.95)}18%{left:18%;top:90px;transform:rotate(3deg) scale(1.06)}43%{left:46%;top:90px;transform:rotate(-2deg) scale(1.12)}62%{left:61%;top:90px;transform:rotate(2deg) scale(1.06)}78%{left:76%;top:90px;transform:rotate(-1deg) scale(1.08)}100%{left:calc(100% - 172px);top:90px;transform:rotate(0) scale(1)}}
+.mainClaimTrack .journeyStatus{position:absolute;left:50%;transform:translateX(-50%);top:24px;z-index:5;min-width:min(620px,75%);text-align:center;padding:10px 16px;border-radius:999px;background:rgba(255,255,255,.9);border:1px solid rgba(15,37,68,.1);box-shadow:var(--soft);color:var(--navy);font-weight:1000;letter-spacing:.2px;}
+.mainClaimTrack.running .journeyStatus{animation:pulseJourney 1s ease-in-out infinite alternate;}
+@keyframes pulseJourney{from{box-shadow:0 12px 28px rgba(15,37,68,.08)}to{box-shadow:0 16px 40px rgba(109,93,252,.22)}}
+.mainClaimTrack .stations{bottom:26px!important;}
+.mainClaimTrack .stationActive{background:linear-gradient(135deg,#ecfeff,#eef2ff)!important;border-color:rgba(0,166,166,.32)!important;color:#0f766e!important;transform:translateY(-2px)!important;}
+.mainClaimTrack .stamp{top:66px!important;}
+
+/* Final journey correction: slow, visible CMS form travels across the line, then turns into a letter. */
+.mainClaimTrack{
+  height:280px!important;
+  min-height:280px!important;
+}
+.mainClaimTrack .journeyLine{
+  top:142px!important;
+  height:10px!important;
+  background:repeating-linear-gradient(90deg, rgba(15,37,68,.28) 0 20px, transparent 20px 34px)!important;
+}
+.mainClaimTrack.running .journeyFill{
+  animation:journeyFillMoveSlow 12.2s linear forwards!important;
+}
+@keyframes journeyFillMoveSlow{
+  0%{width:2%}
+  28%{width:31%}
+  58%{width:58%}
+  78%{width:77%}
+  100%{width:96%}
+}
+.mainClaimTrack .claimPacket{
+  width:142px!important;
+  height:92px!important;
+  top:96px!important;
+  left:30px!important;
+  border-radius:12px!important;
+  background:linear-gradient(180deg,#ffffff 0%,#f8fafc 100%)!important;
+  color:#10233f!important;
+  border:3px solid rgba(15,37,68,.22)!important;
+  box-shadow:0 18px 45px rgba(15,37,68,.18), 0 0 0 7px rgba(0,166,166,.10)!important;
+  font-size:15px!important;
+  align-items:start!important;
+  justify-items:center!important;
+  padding-top:9px!important;
+  overflow:hidden!important;
+}
+.mainClaimTrack .claimPacket::after{
+  content:''!important;
+  position:absolute!important;
+  left:14px!important;
+  right:14px!important;
+  top:34px!important;
+  height:42px!important;
+  background:
+    linear-gradient(rgba(15,37,68,.20),rgba(15,37,68,.20)) 0 0/100% 2px no-repeat,
+    linear-gradient(rgba(15,37,68,.16),rgba(15,37,68,.16)) 0 13px/82% 2px no-repeat,
+    linear-gradient(rgba(15,37,68,.16),rgba(15,37,68,.16)) 0 26px/92% 2px no-repeat,
+    linear-gradient(rgba(0,166,166,.35),rgba(0,166,166,.35)) 0 39px/56% 3px no-repeat!important;
+  border-top:2px solid rgba(109,93,252,.18)!important;
+  pointer-events:none!important;
+}
+.mainClaimTrack.running .claimPacket::before{
+  content:'FIELDS + CODES'!important;
+  position:absolute!important;
+  left:12px!important;
+  bottom:8px!important;
+  width:auto!important;
+  height:auto!important;
+  transform:none!important;
+  border-radius:999px!important;
+  background:rgba(0,166,166,.12)!important;
+  color:#0f766e!important;
+  font-size:9px!important;
+  font-weight:1000!important;
+  padding:3px 6px!important;
+}
+.mainClaimTrack .claimPacket.fly{
+  animation:flyCMSFormToLetter 12.2s cubic-bezier(.18,.82,.2,1) forwards!important;
+}
+@keyframes flyCMSFormToLetter{
+  0%{left:30px;top:96px;transform:rotate(-3deg) scale(.98)}
+  22%{left:20%;top:96px;transform:rotate(2deg) scale(1.03)}
+  46%{left:43%;top:96px;transform:rotate(-1deg) scale(1.05)}
+  61%{left:55%;top:96px;transform:rotate(1deg) scale(1.02)}
+  75%{left:70%;top:96px;transform:rotate(-1deg) scale(1.03)}
+  100%{left:calc(100% - 176px);top:96px;transform:rotate(0) scale(1)}
+}
+.mainClaimTrack .claimPacket.letter{
+  width:132px!important;
+  height:82px!important;
+  padding-top:15px!important;
+  border-radius:8px!important;
+  background:linear-gradient(145deg,#ffffff 0%,#eef2ff 100%)!important;
+  color:#4c1d95!important;
+  border-color:rgba(109,93,252,.38)!important;
+  box-shadow:0 18px 45px rgba(109,93,252,.26), 0 0 0 8px rgba(109,93,252,.10)!important;
+  font-size:15px!important;
+}
+.mainClaimTrack .claimPacket.letter::after{
+  content:''!important;
+  position:absolute!important;
+  left:12px!important;
+  right:12px!important;
+  top:14px!important;
+  bottom:12px!important;
+  height:auto!important;
+  border:2px solid rgba(109,93,252,.28)!important;
+  border-top:none!important;
+  background:
+    linear-gradient(35deg, transparent 49%, rgba(109,93,252,.28) 50%, transparent 52%) 0 0/100% 100% no-repeat,
+    linear-gradient(-35deg, transparent 49%, rgba(109,93,252,.28) 50%, transparent 52%) 0 0/100% 100% no-repeat!important;
+  transform:none!important;
+}
+.mainClaimTrack .claimPacket.letter::before{
+  content:'DECISION'!important;
+  left:50%!important;
+  bottom:8px!important;
+  transform:translateX(-50%)!important;
+  background:rgba(109,93,252,.12)!important;
+  color:#5b21b6!important;
+}
+.mainClaimTrack .journeyStatus{top:20px!important;}
+.mainClaimTrack .stations{bottom:22px!important;}
+.mainClaimTrack .stamp{top:74px!important;}
+@media(max-width:800px){
+  .mainClaimTrack{height:260px!important;min-height:260px!important;}
+  .mainClaimTrack .claimPacket{width:110px!important;height:76px!important;font-size:12px!important;top:98px!important;}
+  .mainClaimTrack .claimPacket.letter{width:106px!important;height:72px!important;font-size:12px!important;}
+  @keyframes flyCMSFormToLetter{
+    0%{left:22px;top:98px;transform:rotate(-3deg) scale(.96)}
+    42%{left:40%;top:98px;transform:rotate(1deg) scale(1.02)}
+    72%{left:62%;top:98px;transform:rotate(-1deg) scale(1.03)}
+    100%{left:calc(100% - 128px);top:98px;transform:rotate(0) scale(1)}
+  }
+}
+
+
+/* Speed correction: CMS form travels in about 2.5 seconds, converts to a moving letter mid-journey, then reaches payer. */
+.mainClaimTrack.running .journeyFill{animation:journeyFillMoveFast 2.5s linear forwards!important;}
+@keyframes journeyFillMoveFast{0%{width:2%}35%{width:42%}58%{width:64%}82%{width:84%}100%{width:96%}}
+.mainClaimTrack .claimPacket.fly{animation:flyCMSFormToLetterFast 2.5s cubic-bezier(.2,.82,.2,1) forwards!important;}
+@keyframes flyCMSFormToLetterFast{0%{left:30px;top:96px;transform:rotate(-3deg) scale(.98)}28%{left:28%;top:96px;transform:rotate(2deg) scale(1.03)}50%{left:48%;top:96px;transform:rotate(-1deg) scale(1.04)}72%{left:68%;top:96px;transform:rotate(1deg) scale(1.02)}100%{left:calc(100% - 176px);top:96px;transform:rotate(0) scale(1)}}
+@media(max-width:800px){@keyframes flyCMSFormToLetterFast{0%{left:22px;top:98px;transform:rotate(-3deg) scale(.96)}35%{left:32%;top:98px;transform:rotate(1deg) scale(1.02)}65%{left:58%;top:98px;transform:rotate(-1deg) scale(1.03)}100%{left:calc(100% - 128px);top:98px;transform:rotate(0) scale(1)}}}
+
+
+/* Final fix: the CMS packet/letter is moved by JavaScript so the letter continues to the payer instead of stopping. */
+.mainClaimTrack .claimPacket.fly{animation:none!important;}
+.mainClaimTrack .claimPacket{transition:width .22s ease,height .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease!important;}
+.mainClaimTrack.running .journeyFill{animation:journeyFillMoveFast 2.5s linear forwards!important;}
+
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap top">
+      <div class="brand"><div class="logo">CC</div><div><h1>Clean Claim Command Center</h1><div class="subtitle">Complex SOAP Notes → Codes → POS → MDM → Modifier → Clearinghouse/Payer Decision</div><div class="brandCredit">Instructional design by Hilary Homaii</div></div></div>
+      <div class="controls noPrint">
+        <button class="btn" id="soundBtn" aria-label="Toggle sound">Sound: On</button>
+        <button class="btn coral" id="resetBtn">Reset</button>
+        <button class="btn gold" onclick="window.print()">Print</button>
+      </div>
+    </div>
+    <div class="nav noPrint" role="tablist">
+      <button class="tab active" data-page="review">1. Quick Review</button>
+      <button class="tab" data-page="lab">2. Five-Case Claim Lab</button>
+      <button class="tab" data-page="cases">3. Case Activities</button>
+      <button class="tab" data-page="plans">4. Plan Decision Lab</button>
+      <button class="tab" data-page="summary">5. Student Summary</button>
+    </div>
+  </header>
+
+  <main>
+    <section class="page active" id="review">
+      <div class="grid">
+        <div class="card span8">
+          <h2>Today’s Mission</h2>
+          <p class="callout"><b>Opening message:</b> You are not just filling out forms. You are reading clinical evidence, choosing the strongest codes, checking the setting, defending medical necessity, and preventing claims from bouncing back.</p>
+          <div class="flow" aria-label="Claim flow diagram">
+            <span>SOAP Note</span><b class="arrow">→</b><span>ICD-10</span><b class="arrow">→</b><span>CPT</span><b class="arrow">→</b><span>Modifier</span><b class="arrow">→</b><span>POS</span><b class="arrow">→</b><span>Clearinghouse</span><b class="arrow">→</b><span>Payer</span>
+          </div>
+        </div>
+        <div class="card span4">
+          <h3>Live Progress</h3>
+          <div class="progressOuter"><div class="progressInner" id="progressBar"></div></div>
+          <p class="mini"><span id="progressText">0 of 5 cases mastered</span></p>
+          <div class="mastery" id="masteryChips"></div>
+        </div>
+        <div class="card span6">
+          <h3>Quick Sorting: Rejected vs. Denied</h3>
+          <p><b>Rejected</b> means the claim could not be processed because required information was missing, invalid, or structurally wrong.</p>
+          <p><b>Denied</b> means the claim was processed, but the payer refused payment because of coverage, policy, medical necessity, or code logic.</p>
+          <button class="btn primary" onclick="goPage('lab')">Start Five-Case Lab</button>
+        </div>
+        <div class="card span6">
+          <h3>Fast Reference</h3>
+          <span class="reviewChip">ICD-10 = why</span><span class="reviewChip">CPT = what</span><span class="reviewChip">POS = where</span><span class="reviewChip">MDM = complexity</span><span class="reviewChip">Modifier = special circumstance</span><span class="reviewChip">Medical necessity = claim argument</span>
+          <p class="warning"><b>Warning:</b> The diagnosis for the visit is not always the patient’s entire medical history. Comorbidities matter only when they affect care, complexity, or medical necessity.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="lab">
+      <div class="grid">
+        <div class="card span12">
+          <h2>Five Complex Case Files</h2>
+          <p>Choose a case. Read the SOAP note. Fill only the decision fields. Send the claim. First it goes to the <b>clearinghouse</b>; if it passes, it goes to the <b>payer</b>.</p>
+          <div class="caseSelect" id="caseSelect"></div>
+          <div class="caseShell">
+            <div class="card soap" id="soapPanel"></div>
+            <div class="card" id="formPanel"></div>
+          </div>
+        </div>
+        <div class="card span12">
+          <h3>Modifier Reference Desk</h3>
+          <p class="mini">Students can consult this while choosing the modifier dropdown. This is intentionally brief so the activity stays fast.</p>
+          <div class="refGrid">
+            <div class="refItem"><b>25</b> — Significant, separately identifiable E/M service on the same day as a procedure.</div>
+            <div class="refItem"><b>50</b> — Bilateral procedure performed on both sides during the same session.</div>
+            <div class="refItem"><b>59</b> — Distinct procedural service; separate site/session/procedure when normally bundled.</div>
+            <div class="refItem"><b>RT / LT</b> — Right side / Left side, when laterality must be shown.</div>
+            <div class="refItem"><b>None</b> — No special circumstance documented; do not add a modifier just to “make it look complete.”</div>
+            <div class="refItem"><b>24</b> — Unrelated E/M during postoperative period. Use only when documentation supports it.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="page" id="cases">
+      <div class="grid">
+        <div class="card span12">
+          <h2>Case Activities: Predict the Claim Problem</h2>
+          <p>Read the evidence, identify the claim problem, predict the decision, choose the correct next step, and repair the claim. The file names do not give away the answer.</p>
+          <div class="activityNav" id="activityNav"></div>
+        </div>
+        <div class="card span12 caseActivityCard" id="activityCasePanel"></div>
+        <div class="card span12 activityWorkWide" id="activityWorkPanel"></div>
+      </div>
+    </section>
+
+
+    <section class="page" id="plans">
+      <div class="grid">
+        <div class="card span12">
+          <h2>Plan Decision Lab: What Will the Insurance Do?</h2>
+          <p>Now investigate the insurance plan itself. Read the plan evidence, choose the plan type, identify the rule that matters, predict what happens, and decide the next action. After three incorrect attempts, the hint button unlocks. Hints come one at a time so you have to think between attempts.</p>
+          <div class="activityNav" id="planNav"></div>
+        </div>
+        <div class="card span12 caseActivityCard" id="planCasePanel"></div>
+        <div class="card span12 activityWorkWide" id="planWorkPanel"></div>
+      </div>
+    </section>
+
+    <section class="page" id="summary">
+      <div class="grid">
+        <div class="card span6">
+          <h2>Student Reflection</h2>
+          <label>One mistake I corrected today was...</label><textarea id="r1"></textarea>
+          <label>The evidence I used was...</label><textarea id="r2"></textarea>
+          <label>One rejection or denial pattern I now understand is...</label><textarea id="r3"></textarea>
+          <label>Next time, before submitting, I will verify...</label><textarea id="r4"></textarea>
+          <button class="btn primary" onclick="makeSummary()">Generate Copy/Paste Summary</button>
+        </div>
+        <div class="card span6">
+          <h2>Generated Summary</h2>
+          <textarea id="finalSummary" style="min-height:260px"></textarea>
+          <button class="btn gold" onclick="copySummary()">Copy Summary</button>
+          <div class="callout"><b>Current score:</b> <span id="scoreLine">0/5 cases mastered.</span></div>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer class="copyrightFooter">© 2026 Hilary Homaii. All rights reserved. Instructional design by Hilary Homaii.</footer>
+  <div class="confetti" id="confetti"></div>
+
+<script>
+/* ------------------------- DATA: Five complex case studies ------------------------- */
+const cases = [
+  {
+    id:'A', tag:'Comorbidity Trap', badge:'trap', title:'COPD flare vs. simple cough',
+    patient:'Leon Grant', dob:'06/18/1961', dos:'04/14/2026', insurance:'Aetna PPO', member:'AET4482019', posText:'Provider office',
+    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Productive cough, wheezing, fever, and increased shortness of breath for 4 days.</div>
+    <div class="soapBlock"><strong>History:</strong> 64-year-old established patient with COPD and hypertension. He uses albuterol more often this week. Denies chest pain. No recent hospital admission.</div>
+    <div class="soapBlock"><strong>Objective:</strong> Temp 100.9°F, RR 22, O2 sat 93% room air, diffuse wheezes, increased sputum, mild accessory muscle use.</div>
+    <div class="soapBlock"><strong>Assessment:</strong> Acute exacerbation of chronic obstructive pulmonary disease. Hypertension stable.</div>
+    <div class="soapBlock"><strong>Plan:</strong> Nebulizer treatment in office, prednisone burst, azithromycin, continue BP medications, follow up in 3 days or sooner if worsening.</div>`,
+    answer:{dx:'J44.1 COPD with acute exacerbation', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
+    dxOptions:['R05.1 Acute cough','J44.1 COPD with acute exacerbation','J20.9 Acute bronchitis, unspecified','J18.9 Pneumonia, unspecified organism','I10 Essential hypertension','R06.02 Shortness of breath','J44.9 COPD, unspecified','Z00.00 General adult exam without abnormal findings'],
+    cptOptions:['99211 Minimal established patient office visit','99212 Established patient office visit, straightforward/low brief','99213 Established patient office visit, low MDM','99214 Established patient office visit, moderate MDM','94640 Pressurized/nonpressurized inhalation treatment only','99203 New patient office visit, low MDM','99221 Initial hospital care','71046 Chest X-ray, 2 views'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','02 Telehealth other than home','49 Independent Clinic'],
+    mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
+    stunner:'The visit is not just an acute cough. The assessment and treatment show a COPD exacerbation affecting management, so the stronger visit diagnosis is J44.1, not a symptom-only cough code or stable hypertension.'
+  },
+  {
+    id:'B', tag:'Specificity Trap', badge:'trap', title:'Diabetic foot ulcer evidence',
+    patient:'Aisha Rahman', dob:'11/02/1974', dos:'04/15/2026', insurance:'UnitedHealthcare EPO', member:'UHC7718902', posText:'Provider office',
+    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Right foot wound with drainage.</div>
+    <div class="soapBlock"><strong>History:</strong> 51-year-old established patient with type 2 diabetes and peripheral neuropathy. She noticed a plantar ulcer under the right great toe 10 days ago. No trauma reported.</div>
+    <div class="soapBlock"><strong>Objective:</strong> Right plantar great toe ulcer with fat layer exposed, mild surrounding erythema, decreased monofilament sensation. No fever. Glucose log elevated.</div>
+    <div class="soapBlock"><strong>Assessment:</strong> Type 2 diabetes mellitus with foot ulcer; non-pressure chronic ulcer of right foot with fat layer exposed; peripheral neuropathy.</div>
+    <div class="soapBlock"><strong>Plan:</strong> Wound culture, dressing change, oral antibiotics, diabetic foot care education, podiatry referral. Medication adjustment discussed.</div>`,
+    answer:{dx:'E11.621 Type 2 diabetes mellitus with foot ulcer', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
+    dxOptions:['E11.9 Type 2 diabetes without complications','E11.40 Type 2 diabetes with neuropathy, unspecified','E11.621 Type 2 diabetes mellitus with foot ulcer','L97.512 Non-pressure chronic ulcer of other part of right foot with fat layer exposed','S91.301A Unspecified open wound, right foot, initial encounter','L03.115 Cellulitis of right lower limb','R73.9 Hyperglycemia, unspecified','Z79.84 Long term use of oral hypoglycemic drugs'],
+    cptOptions:['99212 Established patient, brief problem-focused visit','99213 Established patient, low MDM','99214 Established patient office visit, moderate MDM','11042 Debridement subcutaneous tissue only','99204 New patient office visit, moderate MDM','11720 Nail debridement','99221 Initial hospital care','G0108 Diabetes self-management training'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','31 Skilled Nursing Facility','02 Telehealth other than home'],
+    mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
+    stunner:'The comorbidity is not background noise here. Diabetes is causally tied to the foot ulcer, so the best diagnosis for the visit is the diabetic foot-ulcer code, not uncomplicated diabetes or symptom-only wound language.'
+  },
+  {
+    id:'C', tag:'Modifier 25', badge:'mod', title:'Office visit + wart destruction',
+    patient:'Marco Bellini', dob:'09/27/1990', dos:'04/16/2026', insurance:'BCBS PPO', member:'BCB552701', posText:'Provider office',
+    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Painful plantar wart and new medication rash.</div>
+    <div class="soapBlock"><strong>History:</strong> Established patient presents with painful plantar wart on left foot for several months. Also reports a new itchy rash after starting amoxicillin from urgent care. Provider evaluates the rash separately, documents medication allergy concern, and counsels patient to stop medication and contact prescriber.</div>
+    <div class="soapBlock"><strong>Objective:</strong> Hyperkeratotic plantar wart left foot. Separate maculopapular rash on trunk and arms. No breathing difficulty.</div>
+    <div class="soapBlock"><strong>Assessment:</strong> Plantar wart. Drug eruption/rash, initial evaluation.</div>
+    <div class="soapBlock"><strong>Plan:</strong> Destruction of benign lesion performed. Separate E/M performed for new rash/allergy counseling and safety instructions.</div>`,
+    answer:{dx:'B07.0 Plantar wart', cpt:'99213 + 17110 Established E/M plus destruction of benign lesion', pos:'11 Office', mdm:'Low', mod:'25'},
+    dxOptions:['B07.0 Plantar wart','B07.9 Viral wart, unspecified','R21 Rash and other nonspecific skin eruption','L27.0 Generalized skin eruption due to drugs','L84 Corns and callosities','M79.672 Pain in left foot','T36.0X5A Adverse effect of penicillins, initial encounter','Z88.0 Allergy status to penicillin'],
+    cptOptions:['17110 Destruction of benign lesions only','99213 Established patient office visit only','99213 + 17110 Established E/M plus destruction of benign lesion','99214 + 17000 Established E/M plus premalignant lesion destruction','99203 New patient office visit plus procedure','11055 Paring/cutting benign hyperkeratotic lesion only','10060 Incision and drainage only','99211 Minimal nursing visit only'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','49 Independent Clinic','02 Telehealth other than home'],
+    mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
+    stunner:'Modifier 25 belongs on the E/M because the provider documented a separately identifiable rash/allergy evaluation beyond the wart destruction procedure. Without that modifier, the payer may bundle the E/M into the procedure.'
+  },
+  {
+    id:'D', tag:'POS Mismatch', badge:'trap', title:'Outpatient code with inpatient POS',
+    patient:'Nina Patel', dob:'02/08/1982', dos:'04/17/2026', insurance:'Cigna HMO', member:'CIG2021188', posText:'Outpatient hospital clinic',
+    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Migraine follow-up after ED visit.</div>
+    <div class="soapBlock"><strong>History:</strong> Established patient seen in an outpatient hospital-based neurology clinic. She was not admitted. Migraine frequency increased to 4 times per month. ED visit last week ruled out stroke.</div>
+    <div class="soapBlock"><strong>Objective:</strong> Normal neuro exam today. Vitals stable. Prior CT report reviewed.</div>
+    <div class="soapBlock"><strong>Assessment:</strong> Migraine without aura, not intractable, without status migrainosus.</div>
+    <div class="soapBlock"><strong>Plan:</strong> Adjust preventive medication, prescribe abortive therapy, review trigger diary, follow-up in 6 weeks.</div>`,
+    answer:{dx:'G43.009 Migraine without aura, not intractable, without status migrainosus', cpt:'99214 Established patient office/outpatient visit, moderate MDM', pos:'22 Outpatient Hospital', mdm:'Moderate', mod:'None'},
+    dxOptions:['G43.009 Migraine without aura, not intractable, without status migrainosus','G43.909 Migraine, unspecified, not intractable','R51.9 Headache, unspecified','G44.209 Tension-type headache, unspecified, not intractable','I63.9 Cerebral infarction, unspecified','Z09 Follow-up exam after completed treatment','R42 Dizziness and giddiness','Z79.899 Other long term drug therapy'],
+    cptOptions:['99213 Established patient office/outpatient visit, low MDM','99214 Established patient office/outpatient visit, moderate MDM','99221 Initial hospital inpatient care','99283 Emergency department visit','99204 New patient office/outpatient visit, moderate MDM','99441 Telephone E/M service','96372 Therapeutic injection only','70450 CT head without contrast'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','31 Skilled Nursing Facility','02 Telehealth other than home'],
+    mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
+    stunner:'The patient was in a hospital-based outpatient clinic, not admitted. The contradiction would be using POS 21 inpatient hospital with an outpatient E/M code. The cleaner POS is 22.'
+  },
+  {
+    id:'E', tag:'Modifier 50', badge:'mod', title:'Bilateral knee injections',
+    patient:'Robert Kim', dob:'05/30/1958', dos:'04/18/2026', insurance:'Medicare Advantage', member:'MA8872001', posText:'Provider office',
+    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Bilateral knee pain worsening for 3 months.</div>
+    <div class="soapBlock"><strong>History:</strong> Established patient with known primary osteoarthritis of both knees. Conservative therapy helped only partially. Patient requests injection after discussion of risks and benefits.</div>
+    <div class="soapBlock"><strong>Objective:</strong> Bilateral knee crepitus, medial joint line tenderness, decreased range of motion. No signs of infection.</div>
+    <div class="soapBlock"><strong>Assessment:</strong> Bilateral primary osteoarthritis of knees.</div>
+    <div class="soapBlock"><strong>Plan:</strong> Arthrocentesis/injection performed on right and left knee during same session. Medication documented. Post-procedure instructions given.</div>`,
+    answer:{dx:'M17.0 Bilateral primary osteoarthritis of knee', cpt:'20610 Arthrocentesis/injection major joint', pos:'11 Office', mdm:'Low', mod:'50'},
+    dxOptions:['M17.0 Bilateral primary osteoarthritis of knee','M17.11 Unilateral primary osteoarthritis, right knee','M17.12 Unilateral primary osteoarthritis, left knee','M25.561 Pain in right knee','M25.562 Pain in left knee','M25.569 Pain in unspecified knee','S83.91XA Sprain of unspecified site of right knee, initial encounter','M06.9 Rheumatoid arthritis, unspecified'],
+    cptOptions:['99213 Established patient office visit only','20610 Arthrocentesis/injection major joint','20600 Arthrocentesis/injection small joint','73562 X-ray knee 3 views','99214 Established visit plus no procedure','96372 Therapeutic injection subcutaneous/intramuscular','29881 Knee arthroscopy with meniscectomy','97110 Therapeutic exercises'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','49 Independent Clinic','31 Skilled Nursing Facility'],
+    mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
+    stunner:'The note documents the same major-joint injection on both knees in the same session. The modifier decision is not about pain; it is about laterality and bilateral performance, so modifier 50 is the clean claim signal.'
+  }
+];
+
+/* ------------------------- App state and setup ------------------------- */
+let state = JSON.parse(localStorage.getItem('cleanClaimState')||'{}');
+if(!state.mastered) state.mastered = {};
+if(!state.attempts) state.attempts = {};
+let current = state.current || 'A';
+let soundOn = state.soundOn !== false;
+let teacherOn = state.teacherOn || false;
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function save(){ state.current=current; if(typeof currentActivity!=='undefined') state.currentActivity=currentActivity; state.soundOn=soundOn; state.teacherOn=teacherOn; localStorage.setItem('cleanClaimState', JSON.stringify(state)); updateProgress(); }
+function shuffle(arr){ return [...arr].sort(()=>Math.random()-.5); }
+function escapeHtml(s){ return String(s).replace(/[&<>"]/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+/* ------------------------- Web Audio sound effects ------------------------- */
+let audioCtx;
+function beep(type='click'){
+  if(!soundOn) return;
+  try{
+    audioCtx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+    const o = audioCtx.createOscillator(); const g = audioCtx.createGain();
+    const now = audioCtx.currentTime;
+    const map={click:[440,.05], correct:[660,.08], wrong:[160,.12], warn:[260,.11], success:[880,.16], send:[520,.18]};
+    const [freq,dur]=map[type]||map.click;
+    o.frequency.setValueAtTime(freq, now); if(type==='success'){ o.frequency.exponentialRampToValueAtTime(1320, now+dur); }
+    if(type==='send'){ o.frequency.exponentialRampToValueAtTime(240, now+dur); }
+    g.gain.setValueAtTime(.0001, now); g.gain.exponentialRampToValueAtTime(.16, now+.015); g.gain.exponentialRampToValueAtTime(.0001, now+dur);
+    o.connect(g); g.connect(audioCtx.destination); o.start(now); o.stop(now+dur+.02);
+  }catch(e){}
+}
+
+/* ------------------------- Navigation ------------------------- */
+function goPage(id){
+  $$('.page').forEach(p=>p.classList.remove('active')); $('#'+id).classList.add('active');
+  $$('.tab').forEach(t=>t.classList.toggle('active', t.dataset.page===id)); beep('click'); window.scrollTo({top:0, behavior:'smooth'});
+}
+$$('.tab').forEach(t=>t.addEventListener('click',()=>goPage(t.dataset.page)));
+$('#soundBtn').onclick=()=>{ soundOn=!soundOn; $('#soundBtn').textContent='Sound: '+(soundOn?'On':'Off'); beep('click'); save(); };
+const teacherBtn = $('#teacherBtn'); if(teacherBtn){ teacherBtn.onclick=()=>{ teacherOn=!teacherOn; document.body.classList.toggle('teacherOn', teacherOn); beep('click'); save(); }; }
+$('#resetBtn').onclick=()=>{ if(confirm('Reset progress and all case attempts?')){ localStorage.removeItem('cleanClaimState'); location.reload(); } };
+
+/* ------------------------- Render case selector and current case ------------------------- */
+function renderCaseButtons(){
+  $('#caseSelect').innerHTML = cases.map(c=>`<button class="caseBtn ${c.id===current?'active':''} ${state.mastered[c.id]?'done':''}" onclick="selectCase('${c.id}')"><span class="badge ${c.badge}">Claim File</span><h3>Case ${c.id}</h3><p class="mini">${state.mastered[c.id]?'Mastered':'Needs submission'}</p></button>`).join('');
+}
+function selectCase(id){ current=id; beep('click'); save(); renderAll(); }
+function selectOptions(options, selected){
+  return `<option value="">Choose...</option>` + shuffle(options).map(o=>`<option ${selected===o?'selected':''} value="${escapeHtml(o)}">${escapeHtml(o)}</option>`).join('');
+}
+function renderAll(){ renderCaseButtons(); renderCase(); if(typeof renderActivity==='function') renderActivity(); if(typeof renderPlans==='function') renderPlans(); updateProgress(); $('#soundBtn').textContent='Sound: '+(soundOn?'On':'Off'); document.body.classList.toggle('teacherOn', teacherOn); }
+function renderCase(){
+  const c = cases.find(x=>x.id===current); const saved = state.attempts[c.id] || {};
+  $('#soapPanel').innerHTML = `<h2>Case ${c.id}</h2><p><b>Patient:</b> ${c.patient} &nbsp; <b>DOB:</b> ${c.dob}<br><b>DOS:</b> ${c.dos} &nbsp; <b>Insurance:</b> ${c.insurance} &nbsp; <b>Member:</b> ${c.member}<br><b>Location documented:</b> ${c.posText}</p>${c.soap}`;
+  $('#formPanel').innerHTML = `<h2>Claim Decision Fields</h2>
+    <p class="mini">Demographics are already filled. Students make the coding and claim-logic decisions.</p>
+    <div class="two"><div><label>Patient</label><input type="text" value="${c.patient}" disabled></div><div><label>Date of service</label><input type="text" value="${c.dos}" disabled></div></div>
+    <label for="dx">Diagnosis / ICD-10 logic</label><select id="dx">${selectOptions(c.dxOptions, saved.dx)}</select>
+    <label for="cpt">CPT / service logic</label><select id="cpt">${selectOptions(c.cptOptions, saved.cpt)}</select>
+    <div class="two"><div><label for="pos">POS</label><select id="pos">${selectOptions(c.posOptions, saved.pos)}</select></div><div><label for="mdm">MDM Level</label><select id="mdm">${selectOptions(c.mdmOptions, saved.mdm)}</select></div></div>
+    <label for="mod">Modifier</label><select id="mod">${selectOptions(c.modOptions, saved.mod)}</select>
+    <label for="defense">One-sentence defense</label><textarea id="defense" placeholder="Example: The diagnosis supports the service because...">${saved.defense||''}</textarea>
+    <div class="claimActionBar"><button class="btn primary" onclick="submitClaim()">Send Claim</button><button class="btn" onclick="saveAttemptOnly()">Save Draft</button></div>
+    <div class="claimTrack mainClaimTrack" id="mainJourney" aria-live="polite"><div class="journeyStatus" id="journeyStatus">Ready: click Send Claim to watch the CMS form travel quickly, convert into a moving letter, and reach payer review.</div><div class="journeyLine"><div class="journeyFill" id="journeyFill"></div></div><div class="claimPacket" id="packet">CMS</div><div class="stamp" id="stamp"></div><div class="stations"><span id="stationClinic">Clinic</span><span id="stationClearinghouse">Clearinghouse</span><span id="stationPayer">Payer Review</span></div></div>
+    <div class="result" id="resultBox"></div>`;
+}
+function saveAttemptOnly(){ const c = cases.find(x=>x.id===current); state.attempts[c.id]=getForm(); save(); beep('click'); }
+function getForm(){ return {dx:$('#dx').value,cpt:$('#cpt').value,pos:$('#pos').value,mdm:$('#mdm').value,mod:$('#mod').value,defense:$('#defense').value}; }
+
+/* ------------------------- Submission engine: clearinghouse first, payer second ------------------------- */
+function submitClaim(){
+  const c = cases.find(x=>x.id===current); const f=getForm(); state.attempts[c.id]=f; save();
+  const packet=$('#packet'), stamp=$('#stamp'), box=$('#resultBox'), journey=$('#mainJourney'), status=$('#journeyStatus');
+  const clinic=$('#stationClinic'), clearStation=$('#stationClearinghouse'), payerStation=$('#stationPayer');
+  [clinic, clearStation, payerStation].forEach(x=>x && x.classList.remove('stationActive'));
+
+  // Reset stage
+  journey && journey.classList.remove('running');
+  packet.classList.remove('fly','letter');
+  packet.textContent='CMS-1500';
+  packet.style.setProperty('left','30px','important');
+  packet.style.setProperty('top','96px','important');
+  packet.style.transform='rotate(-3deg) scale(.98)';
+  stamp.className='stamp'; stamp.textContent=''; box.className='result'; box.innerHTML=''; beep('send');
+
+  // Start line animation and explicit packet movement. This prevents the letter from freezing mid-line.
+  void packet.offsetWidth;
+  journey && journey.classList.add('running');
+  if(status) status.textContent='Leaving clinic: the CMS-1500 form is traveling to the clearinghouse.';
+  if(clinic) clinic.classList.add('stationActive');
+
+  const duration = 2500;
+  const startTime = performance.now();
+  let becameLetter = false;
+  let reachedClearinghouse = false;
+  let reachedPayer = false;
+
+  function move(now){
+    const pct = Math.min((now - startTime) / duration, 1);
+    const trackW = journey ? journey.clientWidth : 900;
+    const packetW = packet.offsetWidth || 132;
+    const startX = 30;
+    const endX = Math.max(startX + 20, trackW - packetW - 34);
+    const x = startX + (endX - startX) * pct;
+    packet.style.setProperty('left', x + 'px', 'important');
+    packet.style.setProperty('top', '96px', 'important');
+    packet.style.transform = 'rotate(' + (pct < .5 ? -3 + pct*8 : 1 - (pct-.5)*2) + 'deg) scale(' + (pct < .5 ? 1.0 + pct*.07 : 1.035) + ')';
+
+    if(pct >= .30 && !reachedClearinghouse){
+      reachedClearinghouse = true;
+      if(status) status.textContent='Clearinghouse check: required fields, identifiers, and format are being reviewed.';
+      if(clinic) clinic.classList.remove('stationActive');
+      if(clearStation) clearStation.classList.add('stationActive');
+    }
+    if(pct >= .50 && !becameLetter){
+      becameLetter = true;
+      packet.textContent='LETTER';
+      packet.classList.add('letter');
+      if(status) status.textContent='The CMS form has converted into a payer decision letter — and the letter is still moving.';
+    }
+    if(pct >= .75 && !reachedPayer){
+      reachedPayer = true;
+      if(status) status.textContent='Payer review: medical necessity, code match, POS, MDM, and modifier logic are being checked.';
+      if(clearStation) clearStation.classList.remove('stationActive');
+      if(payerStation) payerStation.classList.add('stationActive');
+    }
+    if(pct < 1) requestAnimationFrame(move);
+    else finishSubmission(c,f,journey,status);
+  }
+  requestAnimationFrame(move);
+}
+
+function finishSubmission(c,f,journey,status){
+  journey && journey.classList.remove('running');
+  if(status) status.textContent='Decision reached. Review the payer response below.';
+  const clear = clearinghouseCheck(f);
+  if(clear){ showResult('rejected', 'REJECTED AT CLEARINGHOUSE', clear.reason, clear.assumed, clear.fix, c); return; }
+  const payer = payerCheck(c,f);
+  if(payer){ showResult('denied', 'DENIED BY PAYER', payer.reason, payer.assumed, payer.fix, c); return; }
+  state.mastered[c.id]=true; save(); showResult('paid','PAID / CLEAN CLAIM', 'The claim passed structural checks and the coding logic supports the documented service.', 'The payer could connect the clinical story, diagnosis, service, modifier, MDM, and setting.', 'No correction needed. Explain the logic and move to the next case.', c); beep('success'); if(Object.keys(state.mastered).length===cases.length) confetti();
+}
+function clearinghouseCheck(f){
+  if(!f.dx||!f.cpt||!f.pos||!f.mdm||!f.mod) return {reason:'One or more required claim fields are blank.', assumed:'The system cannot build a complete claim record.', fix:'Complete every required dropdown before sending.'};
+  if(/all zeros|000000/i.test(f.defense)) return {reason:'Invalid provider identifier pattern detected in the claim note.', assumed:'The rendering provider cannot be validated.', fix:'Replace invalid identifier data before resubmission.'};
+  if(f.cpt.includes('New patient') && f.defense.toLowerCase().includes('established')) return {reason:'New-patient CPT conflicts with established-patient documentation.', assumed:'Patient status is inconsistent.', fix:'Choose an established-patient CPT if the patient is documented as established.'};
+  return null;
+}
+function payerCheck(c,f){
+  const a=c.answer;
+  if(f.pos!==a.pos) return {reason:`Place of service mismatch. You selected ${f.pos}, but the documentation supports ${a.pos}.`, assumed:'The payer cannot confidently match the service family to the setting.', fix:'Correct the POS based on the documented place where care occurred.'};
+  if(f.dx!==a.dx) return {reason:`Diagnosis does not best support the visit. You selected ${f.dx}.`, assumed:'The payer may see a symptom, comorbidity, or less specific diagnosis instead of the medical-necessity reason for today’s service.', fix:'Choose the diagnosis that most directly supports the service documented today.'};
+  if(f.cpt!==a.cpt) return {reason:`CPT/service choice does not match the documented work.`, assumed:'The payer sees the wrong service level, wrong service family, or a missing bundled service relationship.', fix:'Choose the CPT option that matches the documented service and complexity.'};
+  if(f.mdm!==a.mdm) return {reason:`MDM level mismatch. You selected ${f.mdm}, but this case supports ${a.mdm}.`, assumed:'The billed visit level may be over-coded or under-supported.', fix:'Match MDM to problem complexity, data reviewed, and management risk.'};
+  if(f.mod!==a.mod) return {reason:`Modifier problem. You selected ${f.mod}, but the clean claim needs ${a.mod}.`, assumed:'The payer may bundle, reject laterality, or fail to recognize the special circumstance.', fix:'Use the modifier only when the documentation supports the billing story.'};
+  const defense=f.defense.trim();
+  if(defense.length<24) return {reason:'Defense statement is too thin for professional reasoning practice.', assumed:'The reasoning is not clear enough to defend the claim.', fix:'Write one clear sentence naming the evidence and why the claim should process.'};
+  return null;
+}
+function showResult(kind,title,reason,assumed,fix,c){
+  const stamp=$('#stamp'), box=$('#resultBox');
+  stamp.textContent=kind==='paid'?'PAID':kind==='rejected'?'REJECTED':'DENIED'; stamp.style.color=kind==='paid'?'var(--green)':kind==='rejected'?'var(--orange)':'var(--red)'; stamp.classList.add('show');
+  if(kind==='paid') beep('correct'); else beep(kind==='rejected'?'warn':'wrong');
+  box.className='result show '+kind;
+  const pathButtons = kind==='paid'
+    ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div><button class="btn navy" onclick="nextCase()">Next Case</button>`
+    : `<div class="fixList">
+        <button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button>
+        <button class="fixOption" onclick="chooseClaimPath('${kind}','resubmit')">Correct claim fields + resubmit</button>
+        <button class="fixOption" onclick="chooseClaimPath('${kind}','appeal')">Appeal with corrected documentation/support</button>
+      </div><div id="pathGuide"></div>`;
+  box.innerHTML=`<h3>${title}</h3><p><b>Reason:</b> ${reason}</p><p><b>What the system assumed:</b> ${assumed}</p><p><b>How to fix:</b> ${fix}</p>${pathButtons}`;
+}
+function chooseClaimPath(kind,path){
+  const guide=$('#pathGuide'); beep('click');
+  if(kind==='rejected' && path==='appeal'){
+    guide.innerHTML='<div class="claimWrong"><b>Wrong pathway.</b> A rejection usually means the claim never reached full payer adjudication. Correct the field/data problem first, then resubmit.</div>'; return;
+  }
+  if(kind==='denied' && path==='resubmit'){
+    guide.innerHTML='<div class="claimWrong"><b>Wrong pathway.</b> A denial means the payer processed the claim and refused payment. Do not simply resubmit the same logic. Appeal with corrected documentation/support.</div>'; return;
+  }
+  guide.innerHTML='<div class="decisionBanner"><b>Correct pathway.</b> Go back to the fields above, correct the claim, then send it again.</div>';
+  document.querySelector('#dx').scrollIntoView({behavior:'smooth',block:'center'});
+}
+
+const activeHintTimers = {};
+function startHintCountdown(id, seconds){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(activeHintTimers[id]) clearInterval(activeHintTimers[id]);
+  let remaining = Math.max(0, Math.ceil(seconds));
+  function paint(){
+    const mm = String(Math.floor(remaining/60)).padStart(2,'0');
+    const ss = String(remaining%60).padStart(2,'0');
+    el.textContent = remaining>0 ? `${mm}:${ss}` : 'READY';
+    el.classList.toggle('ready', remaining<=0);
+  }
+  paint();
+  activeHintTimers[id] = setInterval(()=>{
+    remaining -= 1;
+    paint();
+    if(remaining<=0){ clearInterval(activeHintTimers[id]); delete activeHintTimers[id]; }
+  },1000);
+}
+
+function getCaseHints(c){
+  return [
+    'Start with the reason for today’s visit. Do not code every condition in the history unless it affects this encounter.',
+    'Check the place of service against the documented location. The setting and the CPT family must tell the same story.',
+    'Compare the CPT option to patient status and work performed. New, established, procedure-only, and E/M-plus-procedure are different claim stories.',
+    'Use MDM by looking at problem complexity, data, and risk. Do not pick a higher level just because the note feels long.',
+    'Only use a modifier when the documentation proves the special circumstance. Ask: separate E/M, bilateral service, distinct procedure, or no modifier?'
+  ];
+}
+function applyHint(id){
+  const c=cases.find(x=>x.id===id); beep('click');
+  if(!state.caseHints) state.caseHints={};
+  const key='main_'+id;
+  const rec=state.caseHints[key] || {shown:0,last:0};
+  const now=Date.now();
+  const panel=$('#pathGuide') || $('#resultBox');
+  const wait=60000-(now-(rec.last||0));
+  if(rec.shown>0 && wait>0){
+    const sec=Math.ceil(wait/1000);
+    const tid=`caseHintTimer_${id}_${Date.now()}`;
+    panel.innerHTML += `<div class="timedHintPanel lockedHint"><b>Hint locked.</b> Think with the evidence first. Next hint opens in <span id="${tid}" class="hintCountdown">${sec}</span>.</div>`;
+    startHintCountdown(tid, sec);
+    return;
+  }
+  const hints=getCaseHints(c);
+  if(rec.shown>=hints.length){
+    panel.innerHTML += `<div class="timedHintPanel"><b>No more hints.</b> You have all five thinking clues. Now defend the claim using the SOAP note.</div>`;
+    return;
+  }
+  const hint=hints[rec.shown];
+  rec.shown += 1; rec.last=now; state.caseHints[key]=rec; save();
+  const tid=`caseHintTimer_${id}_${Date.now()}`;
+  panel.innerHTML += `<div class="timedHintPanel"><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. Use this minute to revise your reasoning before requesting another clue.</span></div>`;
+  startHintCountdown(tid, 60);
+}
+
+function nextCase(){
+  const idx=cases.findIndex(c=>c.id===current); current=cases[Math.min(idx+1,cases.length-1)].id; save(); renderAll(); window.scrollTo({top:0, behavior:'smooth'});
+}
+
+/* ------------------------- Additional quick case activities ------------------------- */
+const activityCases = [
+  { id:'A', title:'Case A', patient:'Elena Morris', facts:`Established patient seen in provider office for 6-day productive cough, fever, fatigue, and right lower-lobe crackles. Assessment: pneumonia, unspecified organism. Chest X-ray ordered and azithromycin started. Documentation supports office/outpatient established visit.`, issue:'No issue: clean claim logic', decision:'PAID', action:'Submit clean claim', correct:{dx:'J18.9 Pneumonia, unspecified organism', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'This is a clean claim because the diagnosis explains why the office visit and chest X-ray order are medically necessary, and POS 11 matches the office setting.' },
+  { id:'B', title:'Case B', patient:'Thomas Weaver', facts:`Established patient follow-up for asthma symptoms is documented in a provider office. The draft claim uses POS 21 inpatient hospital with 99213 office/outpatient E/M. The patient was never admitted.`, issue:'Setting/code-family contradiction', decision:'REJECTED', action:'Correct and resubmit', correct:{dx:'J45.901 Unspecified asthma with acute exacerbation', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'The problem is the contradiction between the service family and the setting: 99213 is office/outpatient E/M, while POS 21 tells the payer inpatient hospital. Correct the POS and resubmit; this is not an appeal problem yet.' },
+  { id:'C', title:'Case C', patient:'Grace Liu', facts:`Same-day encounter includes a planned skin tag removal. The provider also evaluates new chest tightness, reviews risk factors, performs a separate exam, orders an EKG, and documents a separate assessment and plan. The payer denied the E/M as bundled into the minor procedure.`, issue:'Separately identifiable E/M needs modifier support', decision:'DENIED', action:'Appeal with corrected support', correct:{dx:'R07.89 Other chest pain', cpt:'99214 + 11200 Established E/M plus skin tag removal', pos:'11 Office', mod:'25'}, stunner:'This is not merely a resubmission. The payer processed and denied the E/M as bundled. The correct move is to appeal with documentation showing a significant, separately identifiable E/M and modifier 25.' }
+];
+let currentActivity = state.currentActivity || 'A';
+if(!state.activityDone) state.activityDone = {};
+if(!state.activityAnswers) state.activityAnswers = {};
+if(!state.activityChoiceOrders) state.activityChoiceOrders = {};
+function renderActivity(){
+  const c=activityCases.find(x=>x.id===currentActivity); const saved=state.activityAnswers[c.id]||{};
+  $('#activityNav').innerHTML=activityCases.map(x=>`<button class="activityBtn ${x.id===currentActivity?'active':''} ${state.activityDone[x.id]?'done':''}" onclick="selectActivity('${x.id}')"><b>Case ${x.id}</b><br><span class="mini">${state.activityDone[x.id]?'Paid/complete':'Needs decision'}</span></button>`).join('');
+  $('#activityCasePanel').innerHTML=`<h2>Case ${c.id}</h2><p><b>Patient:</b> ${c.patient}</p><div class="soapBlock">${c.facts}</div>`;
+  $('#activityWorkPanel').innerHTML=`<h2>Claim Reasoning</h2>
+    <label>1. Identify the issue</label><div class="issueGrid">${activityChoiceButtons(c.id, 'issue', saved.issue, ['No issue: clean claim logic','Setting/code-family contradiction','Missing patient demographics','Separately identifiable E/M needs modifier support','Diagnosis unrelated to every service','Invalid insurance premium amount'])}</div>
+    <label>2. Predict the payer/claim decision</label><div class="issueGrid">${activityChoiceButtons(c.id, 'decision', saved.decision, ['PAID','REJECTED','DENIED','PENDED FOR PATIENT COPAY'])}</div>
+    <label>3. Choose the correct next action</label><div class="issueGrid">${activityChoiceButtons(c.id, 'action', saved.action, ['Submit clean claim','Correct and resubmit','Appeal with corrected support','Bill the patient immediately'])}</div>
+    <div class="explainBox"><label>4. Explain your reasoning before you check</label><textarea id="activityExplain" placeholder="Use the evidence from the case. Example: The payer would reject/deny/pay because..." oninput="saveActivityExplanation(this.value)">${escapeHtml(saved.explanation||'')}</textarea></div>
+    <button class="btn primary" onclick="checkActivityReasoning()">Check Reasoning</button>
+    <div id="activityFeedback"></div>
+    <div class="miniForm" id="activityMiniForm" style="display:none"></div>`;
+}
+function activityChoiceButtons(caseId, field, selected, choices){
+  const key=caseId+'_'+field;
+  if(!state.activityChoiceOrders[key]){ state.activityChoiceOrders[key]=shuffle([...choices]); save(); }
+  const ordered=state.activityChoiceOrders[key].filter(x=>choices.includes(x));
+  choices.forEach(x=>{ if(!ordered.includes(x)) ordered.push(x); });
+  state.activityChoiceOrders[key]=ordered; save();
+  return ordered.map(ch=>`<button class="choiceCard ${selected===ch?'selected':''}" onclick="setActivityAnswer('${field}', '${escapeJs(ch)}')">${escapeHtml(ch)}</button>`).join('');
+}
+function escapeJs(s){ return String(s).replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+function selectActivity(id){ currentActivity=id; state.currentActivity=id; save(); renderActivity(); beep('click'); }
+function saveActivityExplanation(value){ const c=activityCases.find(x=>x.id===currentActivity); state.activityAnswers[c.id]=state.activityAnswers[c.id]||{}; state.activityAnswers[c.id].explanation=value; save(); }
+function setActivityAnswer(field, value){ const c=activityCases.find(x=>x.id===currentActivity); state.activityAnswers[c.id]=state.activityAnswers[c.id]||{}; state.activityAnswers[c.id][field]=value; save(); renderActivity(); beep('click'); }
+function checkActivityReasoning(){
+  const c=activityCases.find(x=>x.id===currentActivity); const a=state.activityAnswers[c.id]||{}; const fb=$('#activityFeedback');
+  const explanation=(a.explanation||'').trim();
+  if(explanation.length<25){ beep('warn'); fb.innerHTML=`<div class="claimWrong"><h3>Reasoning needed first</h3><p>Before checking, explain your thinking in a full sentence. Use evidence from the case, not a guess. For example: "This should be denied because..." or "This should be corrected and resubmitted because..."</p></div>`; return; }
+  const wrong=[]; if(a.issue!==c.issue) wrong.push('issue'); if(a.decision!==c.decision) wrong.push('decision'); if(a.action!==c.action) wrong.push('next action');
+  if(wrong.length){ beep('wrong'); let guide='';
+    if(c.decision==='DENIED' && a.action==='Correct and resubmit') guide='<p><b>Careful:</b> This was denied, meaning the payer processed it and refused payment. A simple resubmission is the wrong pathway. You need an appeal with documentation/corrected support.</p>';
+    if(c.decision==='REJECTED' && a.action==='Appeal with corrected support') guide='<p><b>Careful:</b> This was rejected before payer adjudication. Do not appeal first. Correct the structural/coding problem and resubmit.</p>';
+    fb.innerHTML=`<div class="claimWrong"><h3>Not clean yet</h3><p>Review your ${wrong.join(', ')}. We need to see the claim logic match the evidence.</p>${guide}<p><b>Hint:</b> Rejected = correct/resubmit. Denied = appeal with documentation or corrected support. Paid = submit clean claim and defend why.</p></div>`; return; }
+  beep('correct'); fb.innerHTML=`<div class="decisionBanner"><h3>Correct pathway: ${c.decision}</h3><p><b>Next action:</b> ${c.action}</p><p>Now complete the mini-claim and send it.</p></div>`; showMiniForm(c);
+}
+function showMiniForm(c){
+  const dxOpts=['J18.9 Pneumonia, unspecified organism','J45.901 Unspecified asthma with acute exacerbation','R07.89 Other chest pain','Z00.00 General adult exam without abnormal findings','I10 Essential hypertension','R05.1 Acute cough','L91.8 Other hypertrophic disorders of the skin','M79.89 Other specified soft tissue disorders'];
+  const cptOpts=['99213 Established patient office/outpatient visit','99214 + 11200 Established E/M plus skin tag removal','99213 + 17110 E/M plus lesion destruction','99221 Initial hospital care','99283 Emergency department visit','71046 Chest X-ray 2 views'];
+  const posOpts=['11 Office','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','12 Home']; const modOpts=['None','25','50','59','RT','LT'];
+  $('#activityMiniForm').style.display='grid';
+  $('#activityMiniForm').innerHTML=`<div><label>Diagnosis</label><select id="aDx">${selectOptions(dxOpts, '')}</select></div><div><label>CPT</label><select id="aCpt">${selectOptions(cptOpts, '')}</select></div><div><label>POS</label><select id="aPos">${selectOptions(posOpts, '')}</select></div><div><label>Modifier</label><select id="aMod">${selectOptions(modOpts, '')}</select></div><div style="grid-column:1/-1"><button class="btn primary" onclick="sendActivityClaim()">${c.decision==='DENIED'?'Appeal + Submit Corrected Support':c.decision==='REJECTED'?'Correct + Resubmit Claim':'Submit Claim'}</button></div><div id="activitySendResult" class="fullClaimResult"></div>`;
+}
+function sendActivityClaim(){
+  const c=activityCases.find(x=>x.id===currentActivity); const ok=$('#aDx').value===c.correct.dx && $('#aCpt').value===c.correct.cpt && $('#aPos').value===c.correct.pos && $('#aMod').value===c.correct.mod; const out=$('#activitySendResult'); beep('send');
+  out.innerHTML=`<div class="claimTrack activityClaimTrack"><div class="claimPacket fly">CMS</div><div class="stamp" id="activityStamp"></div><div class="stations"><span>Clinic</span><span>Clearinghouse</span><span>Payer Review</span></div></div>`;
+  setTimeout(()=>{ 
+    const stamp=$('#activityStamp');
+    if(!ok){ 
+      beep('warn'); 
+      if(stamp){ stamp.textContent=c.decision==='DENIED'?'DENIED':'REJECTED'; stamp.style.color=c.decision==='DENIED'?'var(--red)':'var(--orange)'; stamp.classList.add('show'); }
+      out.innerHTML+=`<div class="claimWrong"><div class="activityStatusStamp ${c.decision==='DENIED'?'denied':'rejected'}">${c.decision==='DENIED'?'DENIED':'REJECTED'}</div><h3>Returned again</h3><p>The pathway was right, but the corrected claim fields are still not clean. Go back to the mini-form and match the documentation.</p><p><b>Reasoning reminder:</b> ${c.stunner}</p></div>`; return; }
+    if(stamp){ stamp.textContent='PAID'; stamp.style.color='var(--green)'; stamp.classList.add('show'); }
+    state.activityDone[c.id]=true; save(); beep('success'); confetti(); out.innerHTML+=`<div class="claimDone"><div class="activityStatusStamp paid">APPROVED / PAID</div><div class="paidLetter"><h3>Payment Letter</h3><p><b>Dear Billing Team,</b></p><p>The claim has been processed successfully. The payer can connect the patient evidence, diagnosis, CPT/service, POS, modifier choice, and documentation support.</p><div class="letterLine"><b>Payment status:</b> Approved for processing/payment.</div></div><p><b>Strong reasoning:</b> ${c.stunner}</p><button class="btn navy" onclick="nextActivity()">Next Case Activity</button></div>`; },2200);}
+function nextActivity(){ const i=activityCases.findIndex(x=>x.id===currentActivity); currentActivity=activityCases[Math.min(i+1,activityCases.length-1)].id; state.currentActivity=currentActivity; save(); renderActivity(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+
+/* ------------------------- Plan Decision Lab: PPO, HMO, High Deductible ------------------------- */
+const planCases = [
+  {id:'P1', patient:'Nadia Brooks', facts:`The patient has an HMO plan. She saw an orthopedic specialist for knee pain. The claim includes the specialist office visit and diagnosis for knee pain. The chart does not show a PCP referral on file. The service itself is covered when the referral requirement is met.`, correct:{plan:'HMO', rule:'Referral required before specialist visit', decision:'DENIED', action:'Obtain referral/support and appeal or correct according to payer rule'}, hint:'HMO plans commonly require the PCP/referral pathway for specialist care. If the payer processed the claim and refused payment because the rule was not met, that is denial logic.', letter:'The payer denied the claim because the specialist visit lacked required referral support.'},
+  {id:'P2', patient:'Marco Silva', facts:`The patient has a PPO plan. He saw an in-network pulmonologist for shortness of breath. No PCP referral is required. The visit is covered, but the plan has a $40 specialist copay. The diagnosis supports the visit.`, correct:{plan:'PPO', rule:'Referral not required for in-network specialist, but copay applies', decision:'APPROVED / PAID', action:'Submit/process the clean claim and collect/apply copay per policy'}, hint:'PPO does not automatically mean free. It usually gives more flexibility, but copay/coinsurance rules can still apply.', letter:'The claim is clean. The payer can process the visit; patient cost-sharing still applies.'},
+  {id:'P3', patient:'Aisha Khan', facts:`The patient has a high-deductible health plan. She had an office visit for acute sinus symptoms. The allowed amount is $145. The deductible has not been met. The diagnosis supports the service and the provider is in network.`, correct:{plan:'High-Deductible Health Plan', rule:'Allowed amount applies to deductible before insurance pays', decision:'PROCESSED — PATIENT RESPONSIBILITY', action:'Post allowed amount to deductible/patient responsibility'}, hint:'A high deductible case is not automatically a denial. If the service is covered and allowed, the payer may process it with patient responsibility.', letter:'The claim was processed. Payment may be $0 from insurance because the allowed amount applies to the unmet deductible.'},
+  {id:'P4', patient:'Liam Chen', facts:`The patient has a PPO plan. The provider ordered an MRI for back pain. The plan requires prior authorization for advanced imaging over $500. The documentation supports the symptom, but no authorization number is present on the claim.`, correct:{plan:'PPO', rule:'Prior authorization required for advanced imaging', decision:'DENIED', action:'Appeal or submit authorization/documentation support according to payer policy'}, hint:'Even PPO plans can require prior authorization for expensive imaging or procedures. This is not a simple copay issue.', letter:'The payer denied the imaging claim because the prior authorization requirement was not documented/met.'}
+];
+let currentPlan = state.currentPlan || 'P1';
+if(!state.planAnswers) state.planAnswers = {};
+if(!state.planDone) state.planDone = {};
+if(!state.planAttempts) state.planAttempts = {};
+if(!state.planHints) state.planHints = {};
+function renderPlans(){
+  const c=planCases.find(x=>x.id===currentPlan); const saved=state.planAnswers[c.id]||{};
+  const planOptions=['PPO','HMO','High-Deductible Health Plan','Medicaid Managed Care','Medicare Advantage'];
+  const ruleOptions=['Referral required before specialist visit','Referral not required for in-network specialist, but copay applies','Allowed amount applies to deductible before insurance pays','Prior authorization required for advanced imaging','Coinsurance starts before deductible is considered','Premium determines whether the claim is paid today'];
+  const decisionOptions=['APPROVED / PAID','DENIED','REJECTED','PROCESSED — PATIENT RESPONSIBILITY','PENDED FOR MISSING PATIENT PHONE'];
+  const actionOptions=['Submit/process the clean claim and collect/apply copay per policy','Obtain referral/support and appeal or correct according to payer rule','Post allowed amount to deductible/patient responsibility','Appeal or submit authorization/documentation support according to payer policy','Bill the full provider charge without payer processing'];
+  $('#planNav').innerHTML=planCases.map(x=>`<button class="activityBtn ${x.id===currentPlan?'active':''} ${state.planDone[x.id]?'done':''}" onclick="selectPlan('${x.id}')"><b>Plan File ${x.id.replace('P','')}</b><br><span class="mini">${state.planDone[x.id]?'Completed':'Needs decision'}</span></button>`).join('');
+  $('#planCasePanel').innerHTML=`<h2>Plan File ${c.id.replace('P','')}</h2><p><b>Patient:</b> ${c.patient}</p><div class="soapBlock">${c.facts}</div>`;
+  $('#planWorkPanel').innerHTML=`<h2>Plan Rule Decision</h2><div class="miniForm"><div><label>Plan type</label><select id="pPlan">${selectOptions(planOptions,saved.plan||'')}</select></div><div><label>Rule that controls the claim</label><select id="pRule">${selectOptions(ruleOptions,saved.rule||'')}</select></div><div><label>Expected result</label><select id="pDecision">${selectOptions(decisionOptions,saved.decision||'')}</select></div><div><label>Best next action</label><select id="pAction">${selectOptions(actionOptions,saved.action||'')}</select></div><div style="grid-column:1/-1"><label>Explain your plan reasoning</label><textarea id="pExplain" placeholder="Explain which plan rule controls the claim and why the payer would pay, deny, reject, or shift responsibility.">${escapeHtml(saved.explanation||'')}</textarea></div><div style="grid-column:1/-1;display:flex;gap:10px;flex-wrap:wrap"><button class="btn primary" onclick="sendPlanDecision()">Send Plan Decision</button><button class="btn gold" onclick="requestPlanHint()">Request Timed Hint</button></div><div id="planHintSlot" class="planResultLarge"></div><div id="planSendResult" class="planResultLarge"></div></div>`;
+}
+function selectPlan(id){ currentPlan=id; state.currentPlan=id; save(); renderPlans(); beep('click'); }
+function getPlanHints(c){
+  return [
+    'Identify the plan type first. The plan type tells you what rule system the payer is likely using.',
+    'Separate access rules from payment rules. Referral, prior authorization, deductible, copay, and coinsurance are not the same thing.',
+    'Ask whether the claim is structurally incomplete, processed but refused, approved, or processed with patient responsibility.',
+    'For HMO and prior authorization cases, look for missing permission/support before the service, not just the diagnosis.',
+    'For PPO and high-deductible cases, remember: flexible access does not mean no patient cost-sharing.'
+  ];
+}
+function requestPlanHint(){
+  const c=planCases.find(x=>x.id===currentPlan); const out=$('#planHintSlot') || $('#planSendResult'); beep('click');
+  const attempts=state.planAttempts[c.id]||0;
+  if(attempts<3){ out.innerHTML=`<div class="timedHintPanel lockedHint"><b>Hints are still locked.</b> Try the evidence first. Hints unlock after 3 incorrect attempts.</div>`; return; }
+  const key='plan_'+c.id; const rec=state.planHints[key] || {shown:0,last:0}; const now=Date.now(); const wait=60000-(now-(rec.last||0));
+  if(rec.shown>0 && wait>0){ const sec=Math.ceil(wait/1000); const tid=`planHintTimer_${c.id}_${Date.now()}`; out.innerHTML=`<div class="timedHintPanel lockedHint"><b>Hint locked.</b> Next plan hint opens in <span id="${tid}" class="hintCountdown">${sec}</span>.</div>`; startHintCountdown(tid, sec); return; }
+  const hints=getPlanHints(c);
+  if(rec.shown>=hints.length){ out.innerHTML=`<div class="timedHintPanel"><b>No more hints.</b> You have all five plan clues. Match the plan rule to the next action.</div>`; return; }
+  const hint=hints[rec.shown]; rec.shown+=1; rec.last=now; state.planHints[key]=rec; save();
+  const tid=`planHintTimer_${c.id}_${Date.now()}`;
+  out.innerHTML=`<div class="timedHintPanel"><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. Use this minute to test the plan rule before requesting another clue.</span></div>`;
+  startHintCountdown(tid, 60);
+}
+function sendPlanDecision(){
+  const c=planCases.find(x=>x.id===currentPlan); const out=$('#planSendResult');
+  const ans={plan:$('#pPlan').value, rule:$('#pRule').value, decision:$('#pDecision').value, action:$('#pAction').value, explanation:$('#pExplain').value.trim()};
+  state.planAnswers[c.id]=ans; state.planAttempts[c.id]=(state.planAttempts[c.id]||0)+1; save();
+  if(ans.explanation.length<25){ beep('warn'); out.innerHTML=`<div class="claimWrong"><h3>Explain first</h3><p>Write one full sentence explaining the plan rule. Do not just pick dropdowns.</p></div>`; return; }
+  beep('send'); out.innerHTML=`<div class="claimTrack activityClaimTrack"><div class="claimPacket fly">PLAN</div><div class="stamp" id="planStamp"></div><div class="stations"><span>Front Desk</span><span>Eligibility / Plan Rules</span><span>Payer Decision</span></div></div>`;
+  setTimeout(()=>{
+    const ok=ans.plan===c.correct.plan && ans.rule===c.correct.rule && ans.decision===c.correct.decision && ans.action===c.correct.action;
+    const stamp=$('#planStamp');
+    if(!ok){
+      beep('wrong'); const attempts=state.planAttempts[c.id]||1;
+      const label=ans.decision.includes('DENIED')?'DENIED':ans.decision.includes('REJECTED')?'REJECTED':'RETURNED';
+      if(stamp){ stamp.textContent=label; stamp.style.color=label==='DENIED'?'var(--red)':label==='REJECTED'?'var(--orange)':'var(--blue)'; stamp.classList.add('show'); }
+      out.innerHTML+=`<div class="claimWrong"><div class="activityStatusStamp ${label==='DENIED'?'denied':label==='REJECTED'?'rejected':'pended'}">${label}</div><h3>Not clean yet</h3><p>Something in the plan type, rule, expected result, or next action does not match the evidence.</p>${attempts>=3?`<div class="hintBox"><b>Hint button unlocked.</b> Click <b>Request Timed Hint</b> when you are ready. It will not reveal the answer directly.</div>`:`<p class="mini">Attempts on this file: ${attempts}. The timed hint button unlocks after 3 incorrect attempts.</p>`}</div>`;
+      return;
+    }
+    const paidish=c.correct.decision==='APPROVED / PAID' || c.correct.decision.includes('PROCESSED');
+    if(stamp){ stamp.textContent=paidish?'YES / PAID':'DENIED'; stamp.style.color=paidish?'var(--green)':'var(--red)'; stamp.classList.add('show'); }
+    state.planDone[c.id]=true; save(); beep('success'); if(Object.keys(state.planDone).length===planCases.length) confetti();
+    out.innerHTML+=`<div class="claimDone"><div class="activityStatusStamp ${paidish?'paid':'denied'}">${c.correct.decision}</div><div class="paidLetter"><h3>${paidish?'Plan Result Letter':'Payer Decision Letter'}</h3><p><b>Dear Billing Team,</b></p><p>${c.letter}</p><div class="letterLine"><b>Correct action:</b> ${c.correct.action}</div></div><button class="btn navy" onclick="nextPlan()">Next Plan File</button></div>`;
+  },3400);
+}
+function nextPlan(){ const i=planCases.findIndex(x=>x.id===currentPlan); currentPlan=planCases[Math.min(i+1,planCases.length-1)].id; state.currentPlan=currentPlan; save(); renderPlans(); window.scrollTo({top:0,behavior:'smooth'}); }
+
+/* ------------------------- Progress, summary, and confetti ------------------------- */
+function updateProgress(){
+  const n=Object.keys(state.mastered||{}).length; const pct=Math.round(n/cases.length*100);
+  $('#progressBar').style.width=pct+'%'; $('#progressText').textContent=`${n} of ${cases.length} cases mastered`; $('#scoreLine').textContent=`${n}/${cases.length} main lab cases mastered; ${Object.keys(state.activityDone||{}).length}/3 case activities completed; ${Object.keys(state.planDone||{}).length}/4 plan files completed.`;
+  $('#masteryChips').innerHTML=cases.map(c=>`<span>${state.mastered[c.id]?'✓':'○'} Case ${c.id}</span>`).join('');
+}
+function makeSummary(){
+  const n=Object.keys(state.mastered||{}).length;
+  const text=`Today I practiced reading complex SOAP notes, identifying the best visit diagnosis, selecting CPT/service logic, choosing POS, checking MDM level, deciding whether a modifier was needed, and interpreting whether a claim was rejected by the clearinghouse or denied by the payer, and applying PPO/HMO/high-deductible plan rules.\n\nMy progress: ${n}/5 cases mastered.\n\nOne mistake I corrected was: ${$('#r1').value||'____'}.\nThe evidence I used was: ${$('#r2').value||'____'}.\nOne rejection or denial pattern I now understand is: ${$('#r3').value||'____'}.\nNext time, before submitting, I will verify: ${$('#r4').value||'____'}.`;
+  $('#finalSummary').value=text; beep('success');
+}
+function copySummary(){ $('#finalSummary').select(); document.execCommand('copy'); beep('correct'); alert('Summary copied.'); }
+function confetti(){
+  const box=$('#confetti'); box.innerHTML=''; const colors=['#00a6a6','#6d5dfc','#ff6b6b','#f7b731','#14b86a'];
+  for(let i=0;i<90;i++){ const d=document.createElement('div'); d.className='piece'; d.style.left=Math.random()*100+'vw'; d.style.top='-30px'; d.style.background=colors[i%colors.length]; d.style.animationDelay=(Math.random()*.8)+'s'; d.style.transform=`rotate(${Math.random()*180}deg)`; box.appendChild(d); }
+  setTimeout(()=>box.innerHTML='',2600);
+}
+
+renderAll();
+</script>
+</body>
+</html>
