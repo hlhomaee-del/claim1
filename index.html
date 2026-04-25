@@ -510,12 +510,17 @@
 .mainClaimTrack .claimPacket{transition:width .22s ease,height .22s ease,background .22s ease,border-color .22s ease,box-shadow .22s ease!important;}
 .mainClaimTrack.running .journeyFill{animation:journeyFillMoveFast 2.5s linear forwards!important;}
 
-</style>
+
+    .chartNote{background:linear-gradient(135deg,#fff,#f8fbff);border:2px solid rgba(13,148,136,.22);border-radius:24px;padding:20px 22px;box-shadow:var(--soft);font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono",monospace;color:#17324d}
+    .chartHeader{display:inline-block;margin-bottom:12px;padding:6px 12px;border-radius:999px;background:linear-gradient(135deg,#e0f2fe,#f5f3ff);font-weight:1000;letter-spacing:.6px;color:#12345a;border:1px solid rgba(37,99,235,.14)}
+    .noteLine{margin:10px 0;padding:9px 12px;border-left:4px solid rgba(13,148,136,.35);background:rgba(255,255,255,.72);border-radius:12px;line-height:1.55}
+    .noteLine b{color:#0f766e}.signature{margin-top:16px;padding-top:12px;border-top:1px dashed rgba(15,37,68,.25);font-family:"Brush Script MT","Segoe Script",cursive;font-size:22px;color:#334155}.signature span{font-weight:900;color:#0f2544}
+  </style>
 </head>
 <body>
   <header>
     <div class="wrap top">
-      <div class="brand"><div class="logo">CC</div><div><h1>Clean Claim Command Center</h1><div class="subtitle">Complex SOAP Notes → Codes → POS → MDM → Modifier → Clearinghouse/Payer Decision</div><div class="brandCredit">Instructional design by Hilary Homaii</div></div></div>
+      <div class="brand"><div class="logo">CC</div><div><h1>Clean Claim Command Center</h1><div class="subtitle">Complex SOAP Notes → Codes → POS → MDM → Modifier → Clearinghouse/Payer Decision</div><div class="brandCredit">Advanced student-facing claim reasoning lab</div></div></div>
       <div class="controls noPrint">
         <button class="btn" id="soundBtn" aria-label="Toggle sound">Sound: On</button>
         <button class="btn coral" id="resetBtn">Reset</button>
@@ -638,79 +643,98 @@
 /* ------------------------- DATA: Five complex case studies ------------------------- */
 const cases = [
   {
-    id:'A', tag:'Comorbidity Trap', badge:'trap', title:'COPD flare vs. simple cough',
-    patient:'Leon Grant', dob:'06/18/1961', dos:'04/14/2026', insurance:'Aetna PPO', member:'AET4482019', posText:'Provider office',
-    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Productive cough, wheezing, fever, and increased shortness of breath for 4 days.</div>
-    <div class="soapBlock"><strong>History:</strong> 64-year-old established patient with COPD and hypertension. He uses albuterol more often this week. Denies chest pain. No recent hospital admission.</div>
-    <div class="soapBlock"><strong>Objective:</strong> Temp 100.9°F, RR 22, O2 sat 93% room air, diffuse wheezes, increased sputum, mild accessory muscle use.</div>
-    <div class="soapBlock"><strong>Assessment:</strong> Acute exacerbation of chronic obstructive pulmonary disease. Hypertension stable.</div>
-    <div class="soapBlock"><strong>Plan:</strong> Nebulizer treatment in office, prednisone burst, azithromycin, continue BP medications, follow up in 3 days or sooner if worsening.</div>`,
+    id:'A', tag:'Office Note', badge:'trap', title:'',
+    patient:'Leon Grant', dob:'06/18/1961', dos:'04/14/2026', insurance:'Aetna PPO', member:'AET4482019', posText:'Provider office', provider:'Dr. Hilary Homaii',
+    soap:`<div class="chartNote"><div class="chartHeader">PROVIDER NOTE</div>
+      <div class="noteLine"><b>CC:</b> breathing worse, cough with thick sputum, wheeze x4 days.</div>
+      <div class="noteLine"><b>Chart:</b> Existing MRN matched. Prior visit in this practice on 02/02/2026 for respiratory medication review; no new-patient intake completed today.</div>
+      <div class="noteLine"><b>HPI:</b> 64 y/o. Long-standing chronic obstructive pulmonary disease; rescue inhaler used more often this week. HTN noted in chart, stable today. No chest pain. No hospital admit.</div>
+      <div class="noteLine"><b>Exam:</b> T 100.9, RR 22, SpO2 93% RA. Diffuse expiratory wheeze, ↑ sputum, mild accessory muscle use. CXR discussed; no focal infiltrate documented today.</div>
+      <div class="noteLine"><b>R/O:</b> pneumonia considered but not established; acute bronchitis not final language.</div>
+      <div class="noteLine"><b>A/P:</b> acute worsening of chronic obstructive lung disease. Neb tx in office. Prednisone burst + azithromycin. Continue BP meds. Return 3 days / ER if worse.</div>
+      <div class="signature">Electronically signed: <span>Dr. Hilary Homaii</span> &nbsp; /s/ H. Homaii</div></div>`,
     answer:{dx:'J44.1 COPD with acute exacerbation', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
-    dxOptions:['R05.1 Acute cough','J44.1 COPD with acute exacerbation','J20.9 Acute bronchitis, unspecified','J18.9 Pneumonia, unspecified organism','I10 Essential hypertension','R06.02 Shortness of breath','J44.9 COPD, unspecified','Z00.00 General adult exam without abnormal findings'],
-    cptOptions:['99211 Minimal established patient office visit','99212 Established patient office visit, straightforward/low brief','99213 Established patient office visit, low MDM','99214 Established patient office visit, moderate MDM','94640 Pressurized/nonpressurized inhalation treatment only','99203 New patient office visit, low MDM','99221 Initial hospital care','71046 Chest X-ray, 2 views'],
+    dxOptions:['R05.1 Acute cough','J44.1 COPD with acute exacerbation','J20.9 Acute bronchitis, unspecified','J18.9 Pneumonia, unspecified organism','I10 Essential hypertension','R06.02 Shortness of breath','J44.9 COPD, unspecified','Z79.51 Long term use of inhaled steroids'],
+    cptOptions:['94640 Pressurized/nonpressurized inhalation treatment only','99213 Established patient office visit, low MDM','99214 Established patient office visit, moderate MDM','99215 Established patient office visit, high MDM','99203 New patient office visit, low MDM','71046 Chest X-ray, 2 views','99221 Initial hospital care','94010 Spirometry only'],
     posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','02 Telehealth other than home','49 Independent Clinic'],
     mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
-    stunner:'The visit is not just an acute cough. The assessment and treatment show a COPD exacerbation affecting management, so the stronger visit diagnosis is J44.1, not a symptom-only cough code or stable hypertension.'
+    stunner:'The note never says “COPD” in the casual way, but “chronic obstructive pulmonary disease” plus acute worsening, wheeze, sputum change, steroid/antibiotic management points to J44.1. Pneumonia was considered but not established, so J18.9 is not the best support.',
+    sampleDefense:'Acceptable medical-necessity defense: The office visit and treatment are supported by acute worsening of chronic obstructive pulmonary disease with wheezing, low oxygen saturation, increased sputum, and medication management; pneumonia was ruled out/not established.'
   },
   {
-    id:'B', tag:'Specificity Trap', badge:'trap', title:'Diabetic foot ulcer evidence',
-    patient:'Aisha Rahman', dob:'11/02/1974', dos:'04/15/2026', insurance:'UnitedHealthcare EPO', member:'UHC7718902', posText:'Provider office',
-    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Right foot wound with drainage.</div>
-    <div class="soapBlock"><strong>History:</strong> 51-year-old established patient with type 2 diabetes and peripheral neuropathy. She noticed a plantar ulcer under the right great toe 10 days ago. No trauma reported.</div>
-    <div class="soapBlock"><strong>Objective:</strong> Right plantar great toe ulcer with fat layer exposed, mild surrounding erythema, decreased monofilament sensation. No fever. Glucose log elevated.</div>
-    <div class="soapBlock"><strong>Assessment:</strong> Type 2 diabetes mellitus with foot ulcer; non-pressure chronic ulcer of right foot with fat layer exposed; peripheral neuropathy.</div>
-    <div class="soapBlock"><strong>Plan:</strong> Wound culture, dressing change, oral antibiotics, diabetic foot care education, podiatry referral. Medication adjustment discussed.</div>`,
+    id:'B', tag:'Office Note', badge:'trap', title:'',
+    patient:'Aisha Rahman', dob:'11/02/1974', dos:'04/15/2026', insurance:'UnitedHealthcare EPO', member:'UHC7718902', posText:'Provider office', provider:'Dr. Meera Solano',
+    soap:`<div class="chartNote"><div class="chartHeader">PROVIDER NOTE</div>
+      <div class="noteLine"><b>CC:</b> draining sore under R big toe, hard to feel bottom of foot.</div>
+      <div class="noteLine"><b>Chart:</b> Existing chart active; prior endocrine follow-up in this office documented 01/20/2026. Patient verified by DOB; outside records not requested today.</div>
+      <div class="noteLine"><b>HPI:</b> 51 y/o. Type two diabetes, long-standing. Peripheral nerve loss documented previously. No injury. Wound present ~10 days. Glucose logs elevated.</div>
+      <div class="noteLine"><b>Exam:</b> plantar ulcer below R hallux; fat layer visible; mild erythema only. No fever. ↓ monofilament sensation.</div>
+      <div class="noteLine"><b>R/O:</b> cellulitis not diagnosed; traumatic open wound not supported; no pressure-injury language.</div>
+      <div class="noteLine"><b>A/P:</b> diabetes-related foot ulcer. Culture. Dressing. Oral antibiotic. Foot-care teaching. Podiatry referral. Med adjustment discussed.</div>
+      <div class="signature">Electronically signed: <span>Dr. Meera Solano</span> &nbsp; /s/ M. Solano</div></div>`,
     answer:{dx:'E11.621 Type 2 diabetes mellitus with foot ulcer', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
     dxOptions:['E11.9 Type 2 diabetes without complications','E11.40 Type 2 diabetes with neuropathy, unspecified','E11.621 Type 2 diabetes mellitus with foot ulcer','L97.512 Non-pressure chronic ulcer of other part of right foot with fat layer exposed','S91.301A Unspecified open wound, right foot, initial encounter','L03.115 Cellulitis of right lower limb','R73.9 Hyperglycemia, unspecified','Z79.84 Long term use of oral hypoglycemic drugs'],
     cptOptions:['99212 Established patient, brief problem-focused visit','99213 Established patient, low MDM','99214 Established patient office visit, moderate MDM','11042 Debridement subcutaneous tissue only','99204 New patient office visit, moderate MDM','11720 Nail debridement','99221 Initial hospital care','G0108 Diabetes self-management training'],
     posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','31 Skilled Nursing Facility','02 Telehealth other than home'],
     mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
-    stunner:'The comorbidity is not background noise here. Diabetes is causally tied to the foot ulcer, so the best diagnosis for the visit is the diabetic foot-ulcer code, not uncomplicated diabetes or symptom-only wound language.'
+    stunner:'The ulcer code is tempting because the wound detail is specific, but the billing story says the ulcer is diabetes-related. The best primary support is E11.621; the ulcer-depth code may be secondary, but uncomplicated diabetes or traumatic wound language misses the documented relationship.',
+    sampleDefense:'Acceptable medical-necessity defense: The visit is supported by a diabetes-related foot ulcer with fat layer visible, neuropathy, culture, antibiotics, dressing care, and referral; cellulitis and trauma were not documented as final diagnoses.'
   },
   {
-    id:'C', tag:'Modifier 25', badge:'mod', title:'Office visit + wart destruction',
-    patient:'Marco Bellini', dob:'09/27/1990', dos:'04/16/2026', insurance:'BCBS PPO', member:'BCB552701', posText:'Provider office',
-    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Painful plantar wart and new medication rash.</div>
-    <div class="soapBlock"><strong>History:</strong> Established patient presents with painful plantar wart on left foot for several months. Also reports a new itchy rash after starting amoxicillin from urgent care. Provider evaluates the rash separately, documents medication allergy concern, and counsels patient to stop medication and contact prescriber.</div>
-    <div class="soapBlock"><strong>Objective:</strong> Hyperkeratotic plantar wart left foot. Separate maculopapular rash on trunk and arms. No breathing difficulty.</div>
-    <div class="soapBlock"><strong>Assessment:</strong> Plantar wart. Drug eruption/rash, initial evaluation.</div>
-    <div class="soapBlock"><strong>Plan:</strong> Destruction of benign lesion performed. Separate E/M performed for new rash/allergy counseling and safety instructions.</div>`,
+    id:'C', tag:'Office Note', badge:'mod', title:'',
+    patient:'Marco Bellini', dob:'09/27/1990', dos:'04/16/2026', insurance:'BCBS PPO', member:'BCB552701', posText:'Provider office', provider:'Dr. N. Everett',
+    soap:`<div class="chartNote"><div class="chartHeader">OFFICE NOTE</div>
+      <div class="noteLine"><b>CC:</b> painful thick lesion L plantar foot; itchy body rash after outside antibiotic.</div>
+      <div class="noteLine"><b>Chart:</b> Existing MRN on file; last office encounter 12/08/2025 for preventive visit. Patient returns with current concerns listed below.</div>
+      <div class="noteLine"><b>HPI:</b> Foot lesion months, painful walking. During visit, patient reports rash started after amoxicillin from urgent care. No throat swelling, no wheeze.</div>
+      <div class="noteLine"><b>Exam:</b> verrucous plantar lesion L foot. Maculopapular eruption trunk/arms; vitals stable.</div>
+      <div class="noteLine"><b>A/P 1:</b> plantar viral lesion treated by destruction today.</div>
+      <div class="noteLine"><b>A/P 2:</b> drug eruption concern evaluated separately; stop med, safety precautions, contact prescriber. Allergy counseling documented.</div>
+      <div class="signature">Electronically signed: <span>Dr. N. Everett</span> &nbsp; /s/ N.E.</div></div>`,
     answer:{dx:'B07.0 Plantar wart', cpt:'99213 + 17110 Established E/M plus destruction of benign lesion', pos:'11 Office', mdm:'Low', mod:'25'},
     dxOptions:['B07.0 Plantar wart','B07.9 Viral wart, unspecified','R21 Rash and other nonspecific skin eruption','L27.0 Generalized skin eruption due to drugs','L84 Corns and callosities','M79.672 Pain in left foot','T36.0X5A Adverse effect of penicillins, initial encounter','Z88.0 Allergy status to penicillin'],
     cptOptions:['17110 Destruction of benign lesions only','99213 Established patient office visit only','99213 + 17110 Established E/M plus destruction of benign lesion','99214 + 17000 Established E/M plus premalignant lesion destruction','99203 New patient office visit plus procedure','11055 Paring/cutting benign hyperkeratotic lesion only','10060 Incision and drainage only','99211 Minimal nursing visit only'],
     posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','49 Independent Clinic','02 Telehealth other than home'],
     mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
-    stunner:'Modifier 25 belongs on the E/M because the provider documented a separately identifiable rash/allergy evaluation beyond the wart destruction procedure. Without that modifier, the payer may bundle the E/M into the procedure.'
+    stunner:'The key is not just that a procedure happened; the note documents a separately evaluated rash/drug-reaction concern. Modifier 25 is needed on the E/M so the payer can see the office visit was separate from the lesion destruction.',
+    sampleDefense:'Acceptable medical-necessity defense: The E/M is separately identifiable because the provider evaluated and counseled a new medication-rash concern in addition to performing destruction of the plantar lesion.'
   },
   {
-    id:'D', tag:'POS Mismatch', badge:'trap', title:'Outpatient code with inpatient POS',
-    patient:'Nina Patel', dob:'02/08/1982', dos:'04/17/2026', insurance:'Cigna HMO', member:'CIG2021188', posText:'Outpatient hospital clinic',
-    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Migraine follow-up after ED visit.</div>
-    <div class="soapBlock"><strong>History:</strong> Established patient seen in an outpatient hospital-based neurology clinic. She was not admitted. Migraine frequency increased to 4 times per month. ED visit last week ruled out stroke.</div>
-    <div class="soapBlock"><strong>Objective:</strong> Normal neuro exam today. Vitals stable. Prior CT report reviewed.</div>
-    <div class="soapBlock"><strong>Assessment:</strong> Migraine without aura, not intractable, without status migrainosus.</div>
-    <div class="soapBlock"><strong>Plan:</strong> Adjust preventive medication, prescribe abortive therapy, review trigger diary, follow-up in 6 weeks.</div>`,
+    id:'D', tag:'Clinic Note', badge:'trap', title:'',
+    patient:'Nina Patel', dob:'02/08/1982', dos:'04/17/2026', insurance:'Cigna HMO', member:'CIG2021188', posText:'Hospital-based outpatient clinic', provider:'Dr. Rafael Ortiz',
+    soap:`<div class="chartNote"><div class="chartHeader">NEUROLOGY CLINIC NOTE / HOSPITAL CAMPUS</div>
+      <div class="noteLine"><b>CC:</b> migraine follow-up after ER visit last week.</div>
+      <div class="noteLine"><b>Site:</b> hospital-based outpatient neurology clinic. Patient seen ambulatory; not admitted; no bed assigned.</div>
+      <div class="noteLine"><b>Chart:</b> Patient has active chart with this hospital-based clinic; prior neurology visit recorded 03/01/2026. Follow-up scheduled by clinic, not an admission order.</div>
+      <div class="noteLine"><b>HPI:</b> Headaches now 4/month. ER ruled out stroke; CT reviewed. No aura reported. No status migrainosus today.</div>
+      <div class="noteLine"><b>Exam:</b> Neuro exam normal. Vitals stable. CT report reviewed with patient.</div>
+      <div class="noteLine"><b>A/P:</b> migraine without aura, not intractable. Adjust preventive therapy, prescribe abortive med, diary review, f/u 6 weeks.</div>
+      <div class="signature">Electronically signed: <span>Dr. Rafael Ortiz</span> &nbsp; /s/ R.O.</div></div>`,
     answer:{dx:'G43.009 Migraine without aura, not intractable, without status migrainosus', cpt:'99214 Established patient office/outpatient visit, moderate MDM', pos:'22 Outpatient Hospital', mdm:'Moderate', mod:'None'},
-    dxOptions:['G43.009 Migraine without aura, not intractable, without status migrainosus','G43.909 Migraine, unspecified, not intractable','R51.9 Headache, unspecified','G44.209 Tension-type headache, unspecified, not intractable','I63.9 Cerebral infarction, unspecified','Z09 Follow-up exam after completed treatment','R42 Dizziness and giddiness','Z79.899 Other long term drug therapy'],
-    cptOptions:['99213 Established patient office/outpatient visit, low MDM','99214 Established patient office/outpatient visit, moderate MDM','99221 Initial hospital inpatient care','99283 Emergency department visit','99204 New patient office/outpatient visit, moderate MDM','99441 Telephone E/M service','96372 Therapeutic injection only','70450 CT head without contrast'],
-    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','31 Skilled Nursing Facility','02 Telehealth other than home'],
+    dxOptions:['G43.009 Migraine without aura, not intractable, without status migrainosus','G43.909 Migraine, unspecified, not intractable, without status migrainosus','R51.9 Headache, unspecified','I63.9 Cerebral infarction, unspecified','G44.209 Tension-type headache, unspecified, not intractable','Z09 Encounter for follow-up examination after completed treatment','R42 Dizziness and giddiness','Z86.73 Personal history of TIA/cerebral infarction'],
+    cptOptions:['99213 Established patient office/outpatient visit, low MDM','99214 Established patient office/outpatient visit, moderate MDM','99221 Initial hospital care, low MDM','99283 Emergency department visit','99441 Telephone evaluation 5-10 minutes','99204 New patient office/outpatient visit, moderate MDM','70450 CT head/brain without contrast','99212 Established patient office/outpatient visit, straightforward MDM'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','02 Telehealth other than home','31 Skilled Nursing Facility'],
     mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
-    stunner:'The patient was in a hospital-based outpatient clinic, not admitted. The contradiction would be using POS 21 inpatient hospital with an outpatient E/M code. The cleaner POS is 22.'
+    stunner:'The word “hospital” alone is not enough for POS 21. The note says hospital-based outpatient clinic and explicitly says not admitted, so the setting supports POS 22 with an office/outpatient E/M family.',
+    sampleDefense:'Acceptable medical-necessity defense: The documented encounter occurred in a hospital-based outpatient clinic, not inpatient admission, and the migraine diagnosis supports the outpatient E/M service and medication adjustment.'
   },
   {
-    id:'E', tag:'Modifier 50', badge:'mod', title:'Bilateral knee injections',
-    patient:'Robert Kim', dob:'05/30/1958', dos:'04/18/2026', insurance:'Medicare Advantage', member:'MA8872001', posText:'Provider office',
-    soap:`<div class="soapBlock"><strong>Chief complaint:</strong> Bilateral knee pain worsening for 3 months.</div>
-    <div class="soapBlock"><strong>History:</strong> Established patient with known primary osteoarthritis of both knees. Conservative therapy helped only partially. Patient requests injection after discussion of risks and benefits.</div>
-    <div class="soapBlock"><strong>Objective:</strong> Bilateral knee crepitus, medial joint line tenderness, decreased range of motion. No signs of infection.</div>
-    <div class="soapBlock"><strong>Assessment:</strong> Bilateral primary osteoarthritis of knees.</div>
-    <div class="soapBlock"><strong>Plan:</strong> Arthrocentesis/injection performed on right and left knee during same session. Medication documented. Post-procedure instructions given.</div>`,
-    answer:{dx:'M17.0 Bilateral primary osteoarthritis of knee', cpt:'20610 Arthrocentesis/injection major joint', pos:'11 Office', mdm:'Low', mod:'50'},
-    dxOptions:['M17.0 Bilateral primary osteoarthritis of knee','M17.11 Unilateral primary osteoarthritis, right knee','M17.12 Unilateral primary osteoarthritis, left knee','M25.561 Pain in right knee','M25.562 Pain in left knee','M25.569 Pain in unspecified knee','S83.91XA Sprain of unspecified site of right knee, initial encounter','M06.9 Rheumatoid arthritis, unspecified'],
-    cptOptions:['99213 Established patient office visit only','20610 Arthrocentesis/injection major joint','20600 Arthrocentesis/injection small joint','73562 X-ray knee 3 views','99214 Established visit plus no procedure','96372 Therapeutic injection subcutaneous/intramuscular','29881 Knee arthroscopy with meniscectomy','97110 Therapeutic exercises'],
-    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','49 Independent Clinic','31 Skilled Nursing Facility'],
+    id:'E', tag:'Provider Note', badge:'mod', title:'',
+    patient:'Grace Okafor', dob:'01/30/1958', dos:'04/18/2026', insurance:'Humana Medicare Advantage', member:'HMA904337', posText:'Provider office', provider:'Dr. Serena Voss',
+    soap:`<div class="chartNote"><div class="chartHeader">PROVIDER NOTE</div>
+      <div class="noteLine"><b>CC:</b> both knees painful, stiffness, worse stairs. Wants injection if appropriate.</div>
+      <div class="noteLine"><b>Chart:</b> Existing orthopedic chart; prior knee evaluation in this practice 11/15/2025. No new-patient intake today.</div>
+      <div class="noteLine"><b>HPI:</b> Chronic degenerative joint disease both knees. No fall. Rheumatoid disease considered historically but not supported today.</div>
+      <div class="noteLine"><b>Exam:</b> crepitus and limited ROM bilaterally. No acute trauma signs. Mild effusion each knee.</div>
+      <div class="noteLine"><b>A/P:</b> primary degenerative arthrosis, bilateral knees. Major joint injection performed R knee and L knee same session. Risks/benefits reviewed; consent signed.</div>
+      <div class="signature">Electronically signed: <span>Dr. Serena Voss</span> &nbsp; /s/ S.V.</div></div>`,
+    answer:{dx:'M17.0 Bilateral primary osteoarthritis of knee', cpt:'20610 Arthrocentesis/injection major joint or bursa', pos:'11 Office', mdm:'Low', mod:'50'},
+    dxOptions:['M17.0 Bilateral primary osteoarthritis of knee','M17.11 Unilateral primary osteoarthritis, right knee','M17.12 Unilateral primary osteoarthritis, left knee','M25.561 Pain in right knee','M25.562 Pain in left knee','M06.9 Rheumatoid arthritis, unspecified','S83.91XA Sprain of unspecified site of right knee, initial encounter','R26.2 Difficulty in walking, not elsewhere classified'],
+    cptOptions:['20610 Arthrocentesis/injection major joint or bursa','99213 Established patient office visit, low MDM only','20600 Arthrocentesis/injection small joint or bursa','73562 X-ray knee 3 views','99214 Established patient office visit, moderate MDM','97110 Therapeutic exercises','J3301 Triamcinolone acetonide injection drug supply','99203 New patient office visit'],
+    posOptions:['11 Office','12 Home','20 Urgent Care Facility','21 Inpatient Hospital','22 Outpatient Hospital','23 Emergency Room','24 Ambulatory Surgical Center','49 Independent Clinic'],
     mdmOptions:['Straightforward','Low','Moderate','High'], modOptions:['None','25','50','59','RT','LT','24','GA'],
-    stunner:'The note documents the same major-joint injection on both knees in the same session. The modifier decision is not about pain; it is about laterality and bilateral performance, so modifier 50 is the clean claim signal.'
+    stunner:'The documentation supports bilateral knee osteoarthritis and injections to both major joints. A unilateral knee-pain code or no modifier would fail to tell the full claim story; modifier 50 communicates the bilateral procedure.',
+    sampleDefense:'Acceptable medical-necessity defense: The procedure is supported by documented bilateral knee degenerative disease with bilateral symptoms, exam findings, consent, and injections performed on both knees during the same session.'
   }
 ];
 
@@ -857,7 +881,7 @@ function finishSubmission(c,f,journey,status){
 function clearinghouseCheck(f){
   if(!f.dx||!f.cpt||!f.pos||!f.mdm||!f.mod) return {reason:'One or more required claim fields are blank.', assumed:'The system cannot build a complete claim record.', fix:'Complete every required dropdown before sending.'};
   if(/all zeros|000000/i.test(f.defense)) return {reason:'Invalid provider identifier pattern detected in the claim note.', assumed:'The rendering provider cannot be validated.', fix:'Replace invalid identifier data before resubmission.'};
-  if(f.cpt.includes('New patient') && f.defense.toLowerCase().includes('established')) return {reason:'New-patient CPT conflicts with established-patient documentation.', assumed:'Patient status is inconsistent.', fix:'Choose an established-patient CPT if the patient is documented as established.'};
+  if(f.cpt.includes('New patient') && /prior|existing|known|mrn|returns|follow-up|follow up/i.test(f.defense)) return {reason:'New-patient CPT conflicts with the chart clues showing the patient is already known to this practice.', assumed:'Patient status is inconsistent.', fix:'Use the CPT family that matches the prior-chart/return-visit evidence.'};
   return null;
 }
 function payerCheck(c,f){
@@ -877,61 +901,10 @@ function showResult(kind,title,reason,assumed,fix,c){
   if(kind==='paid') beep('correct'); else beep(kind==='rejected'?'warn':'wrong');
   box.className='result show '+kind;
   const pathButtons = kind==='paid'
-    ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div><button class="btn navy" onclick="nextCase()">Next Case</button>`
-    : `<div class="fixList">
-        <button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button>
-        <button class="fixOption" onclick="chooseClaimPath('${kind}','resubmit')">Correct claim fields + resubmit</button>
-        <button class="fixOption" onclick="chooseClaimPath('${kind}','appeal')">Appeal with corrected documentation/support</button>
-      </div><div id="pathGuide"></div>`;
-  box.innerHTML=`<h3>${title}</h3><p><b>Reason:</b> ${reason}</p><p><b>What the system assumed:</b> ${assumed}</p><p><b>How to fix:</b> ${fix}</p>${pathButtons}`;
-}
-function chooseClaimPath(kind,path){
-  const guide=$('#pathGuide'); beep('click');
-  if(kind==='rejected' && path==='appeal'){
-    guide.innerHTML='<div class="claimWrong"><b>Wrong pathway.</b> A rejection usually means the claim never reached full payer adjudication. Correct the field/data problem first, then resubmit.</div>'; return;
-  }
-  if(kind==='denied' && path==='resubmit'){
-    guide.innerHTML='<div class="claimWrong"><b>Wrong pathway.</b> A denial means the payer processed the claim and refused payment. Do not simply resubmit the same logic. Appeal with corrected documentation/support.</div>'; return;
-  }
-  guide.innerHTML='<div class="decisionBanner"><b>Correct pathway.</b> Go back to the fields above, correct the claim, then send it again.</div>';
-  document.querySelector('#dx').scrollIntoView({behavior:'smooth',block:'center'});
-}
-
-const activeHintTimers = {};
-function startHintCountdown(id, seconds){
-  const el = document.getElementById(id);
-  if(!el) return;
-  if(activeHintTimers[id]) clearInterval(activeHintTimers[id]);
-  let remaining = Math.max(0, Math.ceil(seconds));
-  function paint(){
-    const mm = String(Math.floor(remaining/60)).padStart(2,'0');
-    const ss = String(remaining%60).padStart(2,'0');
-    el.textContent = remaining>0 ? `${mm}:${ss}` : 'READY';
-    el.classList.toggle('ready', remaining<=0);
-  }
-  paint();
-  activeHintTimers[id] = setInterval(()=>{
-    remaining -= 1;
-    paint();
-    if(remaining<=0){ clearInterval(activeHintTimers[id]); delete activeHintTimers[id]; }
-  },1000);
-}
-
-function getCaseHints(c){
-  return [
-    'Start with the reason for today’s visit. Do not code every condition in the history unless it affects this encounter.',
-    'Check the place of service against the documented location. The setting and the CPT family must tell the same story.',
-    'Compare the CPT option to patient status and work performed. New, established, procedure-only, and E/M-plus-procedure are different claim stories.',
-    'Use MDM by looking at problem complexity, data, and risk. Do not pick a higher level just because the note feels long.',
-    'Only use a modifier when the documentation proves the special circumstance. Ask: separate E/M, bilateral service, distinct procedure, or no modifier?'
-  ];
-}
-function applyHint(id){
-  const c=cases.find(x=>x.id===id); beep('click');
-  if(!state.caseHints) state.caseHints={};
-  const key='main_'+id;
-  const rec=state.caseHints[key] || {shown:0,last:0};
-  const now=Date.now();
+    ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div><div class="callout"><b>Sample accepted medical-necessity answer:</b> ${c.sampleDefense || 'The diagnosis, service, setting, MDM, and modifier are supported by the documented clinical evidence.'}</div><button class="btn navy" onclick="nextCase()">Next Case</button>`
+    : kind==='rejected'
+      ? `<div class="choiceRow"><button class="fixOption" onclick="resubmitPath('rejection')">Correct claim + resubmit</button><button class="fixOption" onclick="wrongPath('appeal')">Appeal denial</button><button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button></div>`
+      : `<div class="choiceRow"><button class="fixOption" onclick="wrongPath('resubmit')">Correct claim + resubmit only</button><button class="fixOption" onclick="resubmitPath('denial')">Appeal with corrected support</button><button class="fixOption" onclick="applyHint('${c.id}')">Request timed hint</button></div>`;
   const panel=$('#pathGuide') || $('#resultBox');
   const wait=60000-(now-(rec.last||0));
   if(rec.shown>0 && wait>0){
@@ -959,9 +932,9 @@ function nextCase(){
 
 /* ------------------------- Additional quick case activities ------------------------- */
 const activityCases = [
-  { id:'A', title:'Case A', patient:'Elena Morris', facts:`Established patient seen in provider office for 6-day productive cough, fever, fatigue, and right lower-lobe crackles. Assessment: pneumonia, unspecified organism. Chest X-ray ordered and azithromycin started. Documentation supports office/outpatient established visit.`, issue:'No issue: clean claim logic', decision:'PAID', action:'Submit clean claim', correct:{dx:'J18.9 Pneumonia, unspecified organism', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'This is a clean claim because the diagnosis explains why the office visit and chest X-ray order are medically necessary, and POS 11 matches the office setting.' },
-  { id:'B', title:'Case B', patient:'Thomas Weaver', facts:`Established patient follow-up for asthma symptoms is documented in a provider office. The draft claim uses POS 21 inpatient hospital with 99213 office/outpatient E/M. The patient was never admitted.`, issue:'Setting/code-family contradiction', decision:'REJECTED', action:'Correct and resubmit', correct:{dx:'J45.901 Unspecified asthma with acute exacerbation', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'The problem is the contradiction between the service family and the setting: 99213 is office/outpatient E/M, while POS 21 tells the payer inpatient hospital. Correct the POS and resubmit; this is not an appeal problem yet.' },
-  { id:'C', title:'Case C', patient:'Grace Liu', facts:`Same-day encounter includes a planned skin tag removal. The provider also evaluates new chest tightness, reviews risk factors, performs a separate exam, orders an EKG, and documents a separate assessment and plan. The payer denied the E/M as bundled into the minor procedure.`, issue:'Separately identifiable E/M needs modifier support', decision:'DENIED', action:'Appeal with corrected support', correct:{dx:'R07.89 Other chest pain', cpt:'99214 + 11200 Established E/M plus skin tag removal', pos:'11 Office', mod:'25'}, stunner:'This is not merely a resubmission. The payer processed and denied the E/M as bundled. The correct move is to appeal with documentation showing a significant, separately identifiable E/M and modifier 25.' }
+  { id:'A', title:'Case A', patient:'Elena Morris', facts:`Existing MRN matched; prior visit in this practice found from last winter. Today: 6-day productive cough, fever, fatigue, and right lower-lobe crackles. Assessment: pneumonia, unspecified organism. Chest X-ray ordered and azithromycin started. Documentation supports an office/outpatient visit for a patient already known to the practice.`, issue:'No issue: clean claim logic', decision:'PAID', action:'Submit clean claim', correct:{dx:'J18.9 Pneumonia, unspecified organism', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'This is a clean claim because the diagnosis explains why the office visit and chest X-ray order are medically necessary, and POS 11 matches the office setting.' },
+  { id:'B', title:'Case B', patient:'Thomas Weaver', facts:`Existing chart shows prior asthma care in this provider office. Today is a follow-up for worsening asthma symptoms. The draft claim uses POS 21 inpatient hospital with 99213 office/outpatient E/M. The note says the patient came to the office and was never admitted.`, issue:'Setting/code-family contradiction', decision:'REJECTED', action:'Correct and resubmit', correct:{dx:'J45.901 Unspecified asthma with acute exacerbation', cpt:'99213 Established patient office/outpatient visit', pos:'11 Office', mod:'None'}, stunner:'The problem is the contradiction between the service family and the setting: 99213 is office/outpatient E/M, while POS 21 tells the payer inpatient hospital. Correct the POS and resubmit; this is not an appeal problem yet.' },
+  { id:'C', title:'Case C', patient:'Grace Liu', facts:`Encounter includes removal of a symptomatic skin tag. During the same visit, the provider evaluates new chest tightness, reviews risk factors, performs additional exam elements, orders an EKG, and documents a distinct assessment and plan. The payer denied the E/M as bundled into the minor procedure.`, issue:'Separately identifiable E/M needs modifier support', decision:'DENIED', action:'Appeal with corrected support', correct:{dx:'R07.89 Other chest pain', cpt:'99214 + 11200 Established E/M plus skin tag removal', pos:'11 Office', mod:'25'}, stunner:'This is not merely a resubmission. The payer processed and denied the E/M as bundled. The correct move is to appeal with documentation showing a significant, separately identifiable E/M and modifier 25.' }
 ];
 let currentActivity = state.currentActivity || 'A';
 if(!state.activityDone) state.activityDone = {};
