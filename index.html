@@ -772,8 +772,6 @@
         </div>
 
         <div class="card span12">
-          <h3>Ready Check</h3>
-          <p class="warning"><b>Important:</b> In the case files, the note may say “chronic obstructive pulmonary disease” while the code option says COPD. The note may say “considered” or “rule out,” but that does not make it the final diagnosis. Read the whole note before choosing.</p>
           <button class="btn primary" onclick="goPage('lab')">Start Five-Case Claim Lab</button>
         </div>
       </div>
@@ -792,7 +790,6 @@
         </div>
         <div class="card span12">
           <h3>Modifier Reference Desk</h3>
-          <p class="mini">Students can consult this while choosing the modifier dropdown. This is intentionally brief so the activity stays fast.</p>
           <div class="refGrid">
             <div class="refItem"><b>25</b> — Significant, separately identifiable E/M service on the same day as a procedure.</div>
             <div class="refItem"><b>50</b> — Bilateral procedure performed on both sides during the same session.</div>
@@ -860,10 +857,10 @@ const cases = [
     patient:'Leon Grant', dob:'06/18/1961', dos:'04/14/2026', insurance:'Aetna PPO', member:'AET4482019', posText:'Provider office', provider:'Dr. Hilary Homaii',
     soap:`<div class="chartNote"><div class="chartHeader">PROVIDER NOTE</div>
       <div class="noteLine"><b>CC:</b> breathing worse, cough with thick sputum, wheeze x4 days.</div>
-      <div class="noteLine"><b>Chart:</b> Existing MRN matched. Prior visit in this practice on 02/02/2026 for respiratory medication review; no new-patient intake completed today.</div>
+      <div class="noteLine"><b>Chart:</b> Existing MRN matched. Prior visit in this practice on 02/02/2026 for respiratory medication review</div>
       <div class="noteLine"><b>HPI:</b> 64 y/o. Long-standing chronic obstructive pulmonary disease; rescue inhaler used more often this week. HTN noted in chart, stable today. No chest pain. No hospital admit.</div>
       <div class="noteLine"><b>Exam:</b> T 100.9, RR 22, SpO2 93% RA. Diffuse expiratory wheeze, ↑ sputum, mild accessory muscle use. CXR discussed; no focal infiltrate documented today.</div>
-      <div class="noteLine"><b>R/O:</b> pneumonia considered but not established; acute bronchitis not final language.</div>
+      <div class="noteLine"><b>R/O:</b> pneumonia and acute bronchitis considered but not established as final diagnoses.</div>
       <div class="noteLine"><b>A/P:</b> acute worsening of chronic obstructive lung disease. Neb tx in office. Prednisone burst + azithromycin. Continue BP meds. Return 3 days / ER if worse.</div>
       <div class="signature">Electronically signed: <span>Dr. Hilary Homaii</span> &nbsp; /s/ H. Homaii</div></div>`,
     answer:{dx:'J44.1 COPD with acute exacerbation', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
@@ -879,10 +876,10 @@ const cases = [
     patient:'Aisha Rahman', dob:'11/02/1974', dos:'04/15/2026', insurance:'UnitedHealthcare EPO', member:'UHC7718902', posText:'Provider office', provider:'Dr. Meera Solano',
     soap:`<div class="chartNote"><div class="chartHeader">PROVIDER NOTE</div>
       <div class="noteLine"><b>CC:</b> draining sore under R big toe, hard to feel bottom of foot.</div>
-      <div class="noteLine"><b>Chart:</b> Existing chart active; prior endocrine follow-up in this office documented 01/20/2026. Patient verified by DOB; outside records not requested today.</div>
+      <div class="noteLine"><b>Chart:</b> Existing chart active; prior endocrine follow-up in this office documented 01/20/2026. Patient verified by two identifiers: name and DOB.</div>
       <div class="noteLine"><b>HPI:</b> 51 y/o. Type two diabetes, long-standing. Peripheral nerve loss documented previously. No injury. Wound present ~10 days. Glucose logs elevated.</div>
       <div class="noteLine"><b>Exam:</b> plantar ulcer below R hallux; fat layer visible; mild erythema only. No fever. ↓ monofilament sensation.</div>
-      <div class="noteLine"><b>R/O:</b> cellulitis not diagnosed; traumatic open wound not supported; no pressure-injury language.</div>
+      <div class="noteLine"><b>R/O:</b> cellulitis not diagnosed; traumatic open wound not supported.</div>
       <div class="noteLine"><b>A/P:</b> diabetes-related foot ulcer. Culture. Dressing. Oral antibiotic. Foot-care teaching. Podiatry referral. Med adjustment discussed.</div>
       <div class="signature">Electronically signed: <span>Dr. Meera Solano</span> &nbsp; /s/ M. Solano</div></div>`,
     answer:{dx:'E11.621 Type 2 diabetes mellitus with foot ulcer', cpt:'99214 Established patient office visit, moderate MDM', pos:'11 Office', mdm:'Moderate', mod:'None'},
@@ -956,6 +953,8 @@ let state = JSON.parse(localStorage.getItem('cleanClaimState')||'{}');
 if(!state.mastered) state.mastered = {};
 if(!state.attempts) state.attempts = {};
 if(!state.caseHints) state.caseHints = {};
+if(!state.caseReturn) state.caseReturn = {};
+let currentReturnContext = null;
 if(!state.optionOrders) state.optionOrders = {};
 if(!state.reviewAnswered) state.reviewAnswered = {};
 let current = state.current || 'A';
@@ -1155,6 +1154,16 @@ function showResult(kind,title,reason,assumed,fix,c){
   box.className='result show '+kind;
 
   const statusClass = kind==='paid' ? 'paid' : kind==='rejected' ? 'rejected' : 'denied';
+  if(kind !== 'paid'){
+    currentReturnContext = {caseId:c.id, kind, title, reason, assumed, fix};
+    state.caseReturn[c.id]=currentReturnContext;
+    save();
+  }
+
+  const generalReturnMessage = kind==='rejected'
+    ? 'The claim did not pass the front-end check. Something in the claim data, identifiers, code family, or required fields needs review.'
+    : 'The payer reviewed the claim and did not approve it. Something in the documentation support, coding logic, service relationship, or payer rule needs review.';
+
   const studentPath = kind==='paid'
     ? `<div class="callout"><b>Stunner answer:</b> ${c.stunner}</div>
        <div class="callout"><b>Sample accepted medical-necessity answer:</b> ${c.sampleDefense || 'The diagnosis, service, setting, MDM, and modifier are supported by the documented clinical evidence.'}</div>
@@ -1174,16 +1183,17 @@ function showResult(kind,title,reason,assumed,fix,c){
   box.innerHTML = `
     <div class="responseReasonPanel ${statusClass}">
       <h3>${title}</h3>
-      <p class="reasonLine"><b>Why this came back:</b> ${reason}</p>
-      <p><b>What the system/payer assumed:</b> ${assumed}</p>
-      <p><b>How to fix it:</b> ${fix}</p>
+      <p class="reasonLine"><b>${kind==='paid' ? 'Why it was paid:' : 'First response:'}</b> ${kind==='paid' ? reason : generalReturnMessage}</p>
+      ${kind==='paid'
+        ? `<p><b>What the system/payer assumed:</b> ${assumed}</p><p><b>How to fix it:</b> ${fix}</p>`
+        : `<p><b>Next step:</b> Recheck the claim evidence before changing answers. The specific rationale unlocks after the fifth hint.</p>`}
     </div>
     <div id="pathGuide" class="pathGuideBox">
       ${kind==='paid'
         ? '<b>Accepted.</b> The claim logic is defensible. Review the sample answer below.'
         : kind==='rejected'
-          ? '<b>Choose the correct return path.</b> A rejection is a front-end processing problem. Fix the claim data and resubmit.'
-          : '<b>Choose the correct return path.</b> A denial means the payer processed the claim and refused payment. Appeal with corrected documentation/support.'}
+          ? '<b>Choose the correct return path.</b> A rejection usually requires correcting claim data before sending again. Use the hints to narrow the exact problem.'
+          : '<b>Choose the correct return path.</b> A denial usually requires stronger support or payer-rule correction. Use the hints before the full rationale unlocks.'}
     </div>
     ${studentPath}`;
 }
@@ -1193,7 +1203,7 @@ function resubmitPath(type){
   if(!guide) return;
   beep('correct');
   if(type==='rejection'){
-    guide.innerHTML = `<b>Correct pathway.</b> This is a rejection, so correct the claim fields and send it again. Look back at the returned reason before changing the dropdowns.`;
+    guide.innerHTML = `<b>Correct pathway.</b> This is a rejection, so correct the claim fields and send it again. Use the hints before changing the dropdowns.`;
   } else {
     guide.innerHTML = `<b>Correct pathway.</b> This is a denial, so you need appeal logic: corrected support, stronger medical-necessity explanation, or documentation that answers the payer concern.`;
   }
@@ -1249,9 +1259,14 @@ function applyHint(id){
   state.caseHints[key]=rec;
   save();
   const tid=`caseHintTimer_${c.id}_${Date.now()}`;
-  panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. You cannot collect all hints at once.</span></div>`;
-  startHintCountdown(tid, 60);
+  const returnInfo = state.caseReturn && state.caseReturn[c.id] ? state.caseReturn[c.id] : currentReturnContext;
+  const finalRationale = (rec.shown >= 5 && returnInfo)
+    ? `<div class="responseReasonPanel ${returnInfo.kind}"><h3>Full rationale unlocked</h3><p class="reasonLine"><b>${returnInfo.kind==='rejected'?'Why it was rejected:':'Why it was denied:'}</b> ${returnInfo.reason}</p><p><b>What the system/payer assumed:</b> ${returnInfo.assumed}</p><p><b>How to fix it:</b> ${returnInfo.fix}</p></div>`
+    : '';
+  panel.innerHTML += `<div class="timedHintPanel"><span class="hourglass">⌛</span><b>Hint ${rec.shown} of 5:</b> ${hint}<br><span class="mini">${rec.shown >= 5 ? 'Full rationale is now unlocked below.' : `Next hint unlocks in <span id="${tid}" class="hintCountdown">01:00</span>. You cannot collect all hints at once.`}</span></div>${finalRationale}`;
+  if(rec.shown < 5) startHintCountdown(tid, 60);
 }
+
 
 function formatSeconds(sec){
   sec=Math.max(0,Math.ceil(sec));
@@ -1325,9 +1340,9 @@ function checkActivityReasoning(){
   if(explanation.length<25){ beep('warn'); fb.innerHTML=`<div class="claimWrong"><h3>Reasoning needed first</h3><p>Before checking, explain your thinking in a full sentence. Use evidence from the case, not a guess. For example: "This should be denied because..." or "This should be corrected and resubmitted because..."</p></div>`; return; }
   const wrong=[]; if(a.issue!==c.issue) wrong.push('issue'); if(a.decision!==c.decision) wrong.push('decision'); if(a.action!==c.action) wrong.push('next action');
   if(wrong.length){ beep('wrong'); let guide='';
-    if(c.decision==='DENIED' && a.action==='Correct and resubmit') guide='<p><b>Careful:</b> This was denied, meaning the payer processed it and refused payment. A simple resubmission is the wrong pathway. You need an appeal with documentation/corrected support.</p>';
-    if(c.decision==='REJECTED' && a.action==='Appeal with corrected support') guide='<p><b>Careful:</b> This was rejected before payer adjudication. Do not appeal first. Correct the structural/coding problem and resubmit.</p>';
-    fb.innerHTML=`<div class="claimWrong"><h3>Not clean yet</h3><p>Review your ${wrong.join(', ')}. We need to see the claim logic match the evidence.</p>${guide}<p><b>Hint:</b> Rejected = correct/resubmit. Denied = appeal with documentation or corrected support. Paid = submit clean claim and defend why.</p></div>`; return; }
+    if(c.decision==='DENIED' && a.action==='Correct and resubmit') guide='<p><b>Careful:</b> The pathway does not match how this type of return is handled. Recheck whether the problem is front-end claim structure or payer review.</p>';
+    if(c.decision==='REJECTED' && a.action==='Appeal with corrected support') guide='<p><b>Careful:</b> The pathway does not match this return type. Recheck whether the claim ever reached payer review.</p>';
+    fb.innerHTML=`<div class="claimWrong"><h3>Not clean yet</h3><p>Review your ${wrong.join(', ')}. We need to see the claim logic match the evidence.</p>${guide}<p><b>Hint:</b> Identify whether the problem is claim structure, payer review, or clean payment logic before choosing the next action.</p></div>`; return; }
   beep('correct'); fb.innerHTML=`<div class="decisionBanner"><h3>Correct pathway: ${c.decision}</h3><p><b>Next action:</b> ${c.action}</p><p>Now complete the mini-claim and send it.</p></div>`; showMiniForm(c);
 }
 function showMiniForm(c){
@@ -1345,7 +1360,7 @@ function sendActivityClaim(){
     if(!ok){ 
       beep('warn'); 
       if(stamp){ stamp.textContent=c.decision==='DENIED'?'DENIED':'REJECTED'; stamp.style.color=c.decision==='DENIED'?'var(--red)':'var(--orange)'; stamp.classList.add('show'); }
-      out.innerHTML+=`<div class="claimWrong"><div class="activityStatusStamp ${c.decision==='DENIED'?'denied':'rejected'}">${c.decision==='DENIED'?'DENIED':'REJECTED'}</div><h3>Returned again</h3><p>The pathway was right, but the corrected claim fields are still not clean. Go back to the mini-form and match the documentation.</p><p><b>Reasoning reminder:</b> ${c.stunner}</p></div>`; return; }
+      out.innerHTML+=`<div class="claimWrong"><div class="activityStatusStamp ${c.decision==='DENIED'?'denied':'rejected'}">${c.decision==='DENIED'?'DENIED':'REJECTED'}</div><h3>Returned again</h3><p>The pathway was right, but the corrected claim fields are still not clean. Go back to the mini-form and match the documentation.</p><p><b>Reasoning reminder:</b> Recheck the documentation, selected fields, and payer pathway before trying again.</p></div>`; return; }
     if(stamp){ stamp.textContent='PAID'; stamp.style.color='var(--green)'; stamp.classList.add('show'); }
     state.activityDone[c.id]=true; save(); beep('success'); confetti(); out.innerHTML+=`<div class="claimDone"><div class="activityStatusStamp paid">APPROVED / PAID</div><div class="paidLetter"><h3>Payment Letter</h3><p><b>Dear Billing Team,</b></p><p>The claim has been processed successfully. The payer can connect the patient evidence, diagnosis, CPT/service, POS, modifier choice, and documentation support.</p><div class="letterLine"><b>Payment status:</b> Approved for processing/payment.</div></div><p><b>Strong reasoning:</b> ${c.stunner}</p><button class="btn navy" onclick="nextActivity()">Next Case Activity</button></div>`; },2200);}
 function nextActivity(){ const i=activityCases.findIndex(x=>x.id===currentActivity); currentActivity=activityCases[Math.min(i+1,activityCases.length-1)].id; state.currentActivity=currentActivity; save(); renderActivity(); window.scrollTo({top:0,behavior:'smooth'}); }
